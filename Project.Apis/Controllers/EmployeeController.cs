@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Project.BLL.Commands.EmployeeCommands;
+using Project.BLL.DTO;
 using Project.BLL.Helper;
 using Project.BLL.Model;
-using Project.BLL.Services;
+using Project.BLL.Queries.EmployeeQueries;
 using Project.DAL.Entities;
 
 
@@ -12,13 +15,13 @@ namespace Project.Apis.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly IEmployeeRepo emp;
         private readonly IMapper mapper;
+        private readonly IMediator mediator;
 
-        public EmployeeController(IEmployeeRepo emp, IMapper mapper)
+        public EmployeeController(IMapper mapper, IMediator mediator)
         {
-            this.emp = emp;
             this.mapper = mapper;
+            this.mediator = mediator;
         }
 
 
@@ -28,7 +31,7 @@ namespace Project.Apis.Controllers
         {
             try
             {
-                var data = await emp.GetAsync();
+                var data = await mediator.Send(new GetAllEmployeesQuery());
                 var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
                 return Ok(new ApiResponse<IEnumerable<EmployeeVM>>()
                 {
@@ -52,11 +55,11 @@ namespace Project.Apis.Controllers
 
         [HttpGet]
         [Route("~/api/Employee/GetEmployeeById/{id}")]
-        public async Task<IActionResult> GetEmployeeById(int id)
+        public async Task<IActionResult> GetEmployeeById([FromRoute] int id)
         {
             try
             {
-                var data = await emp.GetByAsync(emp => emp.Employee_Id == id);
+                var data = await mediator.Send(new GetEmployeeByIdQuery(id));
                 var result = mapper.Map<EmployeeVM>(data);
                 return Ok(new ApiResponse<EmployeeVM>()
                 {
@@ -80,17 +83,17 @@ namespace Project.Apis.Controllers
 
         [HttpPost]
         [Route("~/api/Employee/PostEmployee")]
-        public async Task<IActionResult> PostEmployee(EmployeeVM employee)
+        public async Task<IActionResult> PostEmployee([FromBody] EmployeeVM employee)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    //employee.CVName = employee.CV?.UploadFile("Docs");
-                    //employee.ImageName = employee.Image?.UploadFile("Imgs");
-                    var data = mapper.Map<Employee>(employee);
-                    await emp.CreateEmployeeAsync(data);
-                    return Ok(new ApiResponse<Employee>()
+                    employee.CVName = employee.CV?.UploadFile("Documents");
+                    employee.ImageName = employee.Image?.UploadFile("Images");
+                    var data = mapper.Map<EmployeeDTO>(employee);
+                    await mediator.Send(new CreateEmployeeCommand(data));
+                    return Ok(new ApiResponse<EmployeeDTO>()
                     {
                         Code = 201,
                         Status = "Create",
@@ -120,14 +123,14 @@ namespace Project.Apis.Controllers
 
         [HttpPut]
         [Route("~/api/Employee/PutEmployee")]
-        public async Task<IActionResult> PutEmployee(EmployeeVM employee)
+        public async Task<IActionResult> PutEmployee([FromBody] EmployeeVM employee)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Employee>(employee);
-                    await emp.UpdateEmployeeAsync(data);
+                    await mediator.Send(new UpdateEmployeeCommand(data));
                     return Ok(new ApiResponse<Employee>
                     {
                         Code = 202,
@@ -158,12 +161,12 @@ namespace Project.Apis.Controllers
 
         [HttpDelete]
         [Route("~/api/Employee/SoftDeleteEmployee")]
-        public async Task<IActionResult> SoftDeleteEmployee(EmployeeVM employee)
+        public async Task<IActionResult> SoftDeleteEmployee([FromBody] EmployeeVM employee)
         {
             try
             {
                 var data = mapper.Map<Employee>(employee);
-                await emp.DeleteEmployeeAsync(data);
+                await mediator.Send(new SoftDeleteEmployeeCommand(data));
                 return Ok(new ApiResponse<Employee>
                 {
                     Code = 200,
@@ -186,14 +189,14 @@ namespace Project.Apis.Controllers
 
         [HttpDelete]
         [Route("~/api/Employee/DeleteEmployee")]
-        public async Task<IActionResult> DeleteEmployee(EmployeeVM employee)
+        public async Task<IActionResult> DeleteEmployee([FromBody] EmployeeVM employee)
         {
             try
             {
-                //employee.CV?.RemoveFile("Docs");
-                //employee.Image?.RemoveFile("Imgs");
+                employee.CV?.RemoveFile("Documents");
+                employee.Image?.RemoveFile("Images");
                 var data = mapper.Map<Employee>(employee);
-                await emp.FinalDeleteAsync(data);
+                await mediator.Send(new DeleteEmployeeCommand(data));
                 return Ok(new ApiResponse<Employee>
                 {
                     Code = 200,

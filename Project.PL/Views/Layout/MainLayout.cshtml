@@ -1,4 +1,5 @@
 ﻿@using System.Security.Claims
+@inject SignInManager<ApplicationUser> signinmanager
 <!DOCTYPE html>
 
 <html>
@@ -81,11 +82,11 @@
                     <!-- Notifications -->
                     <li class="dropdown">
                         <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                            <i class="material-icons">notifications</i>
+                            @* <i class="material-icons">notifications</i> *@
                             <span class="label-count">7</span>
                         </a>
                         <ul class="dropdown-menu">
-                            @* <li class="header">NOTIFICATIONS</li> *@
+                            <li class="header">NOTIFICATIONS</li>
                             <li class="body">
                                 <ul class="menu">
                                     <li>
@@ -219,34 +220,83 @@
             <div class="menu">
                 <ul class="list">
                     <li class="header">MAIN NAVIGATION</li>
-                    <li class="active">
-                        <a asp-controller="Home" asp-action="Index">
-                            <i class="material-icons">home</i>
-                            <span>@Localizer["Home"]</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">keyboard_double_arrow_right</i>
-                            <span>@Localizer["Department"]</span>
-                        </a>
-                        <ul class="ml-menu">
-                            <li>
-                                <a asp-controller="Department" asp-action="DepartmentServices">@Localizer["DepartmentServices"]</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">keyboard_double_arrow_right</i>
-                            <span>@Localizer["Employee"]</span>
-                        </a>
-                        <ul class="ml-menu">
-                            <li>
-                                <a asp-controller="Employee" asp-action="EmployeeServices">@Localizer["EmployeeServices"]</a>
-                            </li>
-                        </ul>
-                    </li>
+
+
+
+                    @if (signinmanager.IsSignedIn(User) && User.IsInRole("Admin") || User.IsInRole("Hr") || User.IsInRole("Employee"))
+                    {
+                        <li class="active">
+                            <a asp-controller="Home" asp-action="Index">
+                                <i class="material-icons">home</i>
+                                <span>@Localizer["Home"]</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="javascript:void(0);" class="menu-toggle">
+                                <i class="material-icons">keyboard_double_arrow_right</i>
+                                <span>@Localizer["Employee"]</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a asp-controller="Employee" asp-action="EmployeeServices">@Localizer["EmployeeServices"]</a>
+                                </li>
+                            </ul>
+                        </li>
+                      
+                    }
+
+                    @if(signinmanager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        <li>
+                            <a href="javascript:void(0);" class="menu-toggle">
+                                <i class="material-icons">keyboard_double_arrow_right</i>
+                                <span>@Localizer["Department"]</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a asp-controller="Department" asp-action="DepartmentServices">@Localizer["DepartmentServices"]</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" class="menu-toggle">
+                                <i class="material-icons">keyboard_double_arrow_right</i>
+                                <span>Users</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a asp-controller="User" asp-action="GetUsers">All Users</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" class="menu-toggle">
+                                <i class="material-icons">keyboard_double_arrow_right</i>
+                                <span>Roles</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a asp-controller="Roles" asp-action="GetRoles">All Roles</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+                    @if(signinmanager.IsSignedIn(User) && User.IsInRole("Hr"))
+                    {
+                        <li>
+                            <a href="javascript:void(0);" class="menu-toggle">
+                                <i class="material-icons">keyboard_double_arrow_right</i>
+                                <span>@Localizer["Department"]</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a asp-controller="Department" asp-action="DepartmentServices">@Localizer["DepartmentServices"]</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
                     <li>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">keyboard_double_arrow_right</i>
@@ -257,7 +307,7 @@
                                 <a asp-controller="Email" asp-action="SendEmail">@Localizer["Send"]</a>
                             </li>
                             <li>
-                                <a href = "https://mail.google.com/mail/u/0/#inbox">@Localizer["Inbox"]</a>
+                                <a href="https://mail.google.com/mail/u/0/#inbox">@Localizer["Inbox"]</a>
                             </li>
                         </ul>
                     </li>

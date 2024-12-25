@@ -61,7 +61,6 @@
                                     <th>@Localizer["District"]</th>
                                     <th>@Localizer["Return"]</th>
                                     <th>@Localizer["Details"]</th>
-                                    <th>@Localizer["Update"]</th>
                                     <th>@Localizer["Delete"]</th>
                                 </tr>
                             </thead>
@@ -78,7 +77,6 @@
                                         <td>@item.District?.District_Name</td>
                                         <td><a asp-action="ReturnEmployee" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-primary">@Localizer["Return"]</a></td>
                                         <td><a asp-action="Details" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-success">@Localizer["Details"]</a></td>
-                                        <td><a asp-action="Update" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-warning">@Localizer["Update"]</a></td>
                                         <td><a asp-action="Delete" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-danger">@Localizer["Delete"]</a></td>
                                     </tr>
                                 }

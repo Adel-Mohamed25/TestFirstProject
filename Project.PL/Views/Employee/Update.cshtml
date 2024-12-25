@@ -1,5 +1,4 @@
-﻿@using Project.BLL.Services
-@* @inject IDepartmentRepo department *@
+﻿@* @inject IDepartmentRepo department *@
 @inject ICountryRepo country
 @model EmployeeVM
 @{
@@ -99,4 +98,48 @@
 @section JqueryValidation {
     <script src="~/plugins/jquery-validation/jquery.validate.js"></script>
     <script src="~/plugins/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(function () {
+            $("#CountryList").change(function () {
+
+                const CountryId = $("#CountryList option:selected").val();
+                $("#CityList").html("<option>Choose City</option>");
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Employee/GetCitiesByCountryId",
+                    data: { countryid: CountryId },
+                    success: function (result) {
+                        $.each(result, function (index, element) {
+                            $("#CityList").append("<option value='" + element.city_Id + "'>" + element.city_Name + "</option>");
+                        });
+
+                        $('select').selectpicker('refresh');
+                    }
+                });
+
+            });
+        });
+        $(function () {
+            $("#CityList").change(function () {
+
+                const CityId = $("#CityList option:selected").val();
+                $("#District_Id").html("<option>Choose District</option>");
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Employee/GetDistrictsByCityId",
+                    data: { cityid: CityId },
+                    success: function (result) {
+                        $.each(result, function (index, element) {
+                            $("#District_Id").append("<option value='" + element.district_Id + "'>" + element.district_Name + "</option>");
+                        });
+
+                        $('select').selectpicker('refresh');
+                    }
+                });
+
+            });
+        });
+    </script>
 }

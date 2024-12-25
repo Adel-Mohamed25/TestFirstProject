@@ -4,7 +4,7 @@
     Layout = "~/Views/Layout/MainLayout.cshtml";
 }
 
-<h2>SendEmail</h2>
+<h2>Send Email</h2>
 <br />
 <br />
 <h3 >@ViewBag.Message</h3>
@@ -12,26 +12,26 @@
 <br />
 
 <form asp-controller="Email" asp-action="SendEmail" class="form-group">
-     <lable asp-for="Email">Email</lable>
+     <label asp-for="Email">Email</label>
     <br />
     <input type="text" asp-for="Email" class="form-control"/>
-    <span asp-validation-for="Email" class="text-denger font-bold"></span>
+    <span asp-validation-for="Email" class="text-danger font-bold"></span>
     <br />
 
-    <lable asp-for="Title">Title</lable>
+    <label asp-for="Title">Title</label>
     <br />
     <input type="text" asp-for="Title" class="form-control"/>
-    <span asp-validation-for="Title" class="text-denger font-bold"></span>
+    <span asp-validation-for="Title" class="text-danger font-bold"></span>
     <br />
 
-    <lable asp-for="Message">Message</lable>
+    <label asp-for="Message">Message</label>
     <br />
     <textarea asp-for="Message" class="form-control"></textarea>
-    <span asp-validation-for="Message" class="text-denger font-bold"></span>
+    <span asp-validation-for="Message" class="text-danger font-bold"></span>
     <br />
     <br />
     <center>
-        <input type="submit" value="Send" class="btn btn-Pink btn-block btn-primary" />
+        <input type="submit" value="Send" class="btn btn-pink btn-block btn-primary" />
     </center>
 </form>
 

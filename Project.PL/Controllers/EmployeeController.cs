@@ -1,29 +1,34 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Project.BLL.Helper;
 using Project.BLL.Model;
+using Project.BLL.Repository;
 using Project.BLL.Services;
 using Project.DAL.Entities;
 
 
 namespace Project.PL.Controllers
 {
+    [Authorize(Roles = "Employee,Admin , Hr")]
     public class EmployeeController : Controller
     {
-        private readonly IEmployeeRepo emp;
+        private readonly IServicesRepo<Employee> emp;
+        private readonly IServicesRepo<Department> depart;
         private readonly IMapper mapper;
-        private readonly IDepartmentRepo depart;
         private readonly ICityRepo city;
         private readonly IDistrictRepo district;
+        private readonly EmployeeRepo repo;
 
-        public EmployeeController(IEmployeeRepo emp, IMapper mapper, IDepartmentRepo department, ICityRepo city, IDistrictRepo district)
+        public EmployeeController(IServicesRepo<Employee> emp, IServicesRepo<Department> depart, IMapper mapper, ICityRepo city, IDistrictRepo district, EmployeeRepo repo)
         {
             this.emp = emp;
+            this.depart = depart;
             this.mapper = mapper;
-            this.depart = department;
             this.city = city;
             this.district = district;
+            this.repo = repo;
         }
 
         public async Task<IActionResult> EmployeeServices(string searchvalue)
@@ -57,10 +62,10 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    employee.CVName = employee.CV.UploadFile("Docs");
-                    employee.ImageName = employee.Image.UploadFile("Imgs");
+                    employee.CVName = employee.CV?.UploadFile("wwwroot", "Documents");
+                    employee.ImageName = employee.Image?.UploadFile("wwwroot", "Images");
                     var data = mapper.Map<Employee>(employee);
-                    await emp.CreateEmployeeAsync(data);
+                    await emp.CreateAsync(data);
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
             }
@@ -75,28 +80,28 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var data = await emp.GetByAsync(emp => emp.Employee_Id == id && emp.IsActive == true);
+            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
             var result = mapper.Map<EmployeeVM>(data);
             return View(result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> SoftDelete(int id)
         {
-            var data = await emp.GetByAsync(emp => emp.Employee_Id == id && emp.IsActive == true && emp.IsDeleted == false);
+            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
             var result = mapper.Map<EmployeeVM>(data);
             return View(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(EmployeeVM employee)
+        public async Task<IActionResult> SoftDelete(EmployeeVM employee)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Employee>(employee);
-                    await emp.DeleteEmployeeAsync(data);
+                    await repo.SoftDeleteAsync(data);
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
             }
@@ -112,7 +117,7 @@ namespace Project.PL.Controllers
         {
             var departments = await depart.GetAsync();
             ViewBag.departmentlist = new SelectList(departments, "Department_Id", "Department_Name");
-            var data = await emp.GetByAsync(emp => emp.Employee_Id == id && emp.IsActive == true && emp.IsDeleted == false);
+            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
             var result = mapper.Map<EmployeeVM>(data);
             return View(result);
         }
@@ -124,8 +129,10 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    //employee.CVName = employee.CV.UploadFile("Docs");
+                    //employee.ImageName = employee.Image.UploadFile("Imgs");
                     var data = mapper.Map<Employee>(employee);
-                    await emp.UpdateEmployeeAsync(data);
+                    await emp.UpdateAsync(data);
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
             }
@@ -137,24 +144,24 @@ namespace Project.PL.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> FinalDelete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var data = await emp.GetByAsync(emp => emp.Employee_Id == id && emp.IsActive == true && emp.IsDeleted == true);
+            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id && emp.IsDeleted == true);
             var result = mapper.Map<EmployeeVM>(data);
             return View(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> FinalDelete(EmployeeVM employee)
+        public async Task<IActionResult> Delete(EmployeeVM employee)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    employee.CV.RemoveFile("Docs");
-                    employee.Image.RemoveFile("Imgs");
+                    employee.CV?.RemoveFile("wwwroot", "Documents");
+                    employee.Image?.RemoveFile("wwwroot", "Images");
                     var data = mapper.Map<Employee>(employee);
-                    await emp.FinalDeleteAsync(data);
+                    await emp.DeleteAsync(data);
                     return RedirectToAction("DeletedEmployee", "Employee");
                 }
             }
@@ -167,16 +174,39 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> DeletedEmployee()
         {
-            var data = await emp.GetAsync(emp => emp.IsActive == true && emp.IsDeleted == true);
+            var data = await emp.GetAsync(emp => emp.IsDeleted == true);
             var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
             return View(result);
         }
 
+        [HttpGet]
         public async Task<IActionResult> ReturnEmployee(int id)
         {
-            var result = await emp.GetByAsync(emp => emp.Employee_Id == id);
-            await emp.ReturnEmployeeAsync(result);
-            return RedirectToAction("EmployeeServices");
+            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
+
+            var result = mapper.Map<EmployeeVM>(data);
+
+            return View(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReturnEmployee(EmployeeVM employee)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var data = mapper.Map<Employee>(employee);
+                    await repo.ReturnAsync(data);
+                    return RedirectToAction("EmployeeServices");
+                }
+            }
+            catch
+            {
+                return View(employee);
+            }
+
+            return View(employee);
         }
 
         [HttpPost]

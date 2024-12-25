@@ -4,7 +4,7 @@
     Layout = "~/Views/Layout/MainLayout.cshtml";
 }
 
-<form  asp-action="EmployeeServices"  asp-controller="Employee" class="form-group">
+<form class="form-group">
     
     <label asp-for="Employee_Fname">@Localizer["FirstName"]</label>
     <br />
@@ -58,12 +58,6 @@
     <br />
     <input type="text" asp-for="District.District_Name" class="form-control" readonly />
     <br />
-    <center>
-        <input type="submit" value=@Localizer["Return"] class="btn btn-success" />
-        <a asp-controller="Employee" asp-action="Update" class="btn btn-warning" asp-route-id="@Model.Employee_Id">@Localizer["Update"]</a>
-        <a asp-controller="Employee" asp-action="Delete" class="btn btn-danger" asp-route-id="@Model.Employee_Id">@Localizer["Delete"]</a>
-    </center>
-
 </form>
 
 

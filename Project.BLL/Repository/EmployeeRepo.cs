@@ -2,7 +2,7 @@
 
 namespace Project.BLL.Repository
 {
-    public class EmployeeRepo : IEmployeeRepo
+    public class EmployeeRepo : IServicesRepo<Employee>
     {
         ApplicationDbContext db;
 
@@ -26,7 +26,7 @@ namespace Project.BLL.Repository
                                      .ToListAsync();
         }
 
-        public async Task<Employee> GetByAsync(Expression<Func<Employee, bool>> filter)
+        public async Task<Employee> GetByIdAsync(Expression<Func<Employee, bool>> filter)
         {
             var data = await db.Employees.AsNoTracking()
                                          .Where(filter)
@@ -39,14 +39,14 @@ namespace Project.BLL.Repository
             return data;
         }
 
-        public async Task CreateEmployeeAsync(Employee employee)
+        public async Task CreateAsync(Employee employee)
         {
             employee.CreationDate = DateTime.Now;
             await db.Employees.AddAsync(employee);
             await db.SaveChangesAsync();
         }
 
-        public async Task UpdateEmployeeAsync(Employee employee)
+        public async Task UpdateAsync(Employee employee)
         {
             employee.IsUpdated = true;
             employee.UpdatedDate = DateTime.Now;
@@ -54,12 +54,13 @@ namespace Project.BLL.Repository
             await db.SaveChangesAsync();
         }
 
-        public async Task DeleteEmployeeAsync(Employee employee)
+        public async Task SoftDeleteAsync(Employee employee)
         {
             var data = await db.Employees.FindAsync(employee.Employee_Id);
             if (data != null)
             {
                 data.IsDeleted = true;
+                data.IsActive = false;
                 data.DeletedDate = DateTime.Now;
                 await db.SaveChangesAsync();
             }
@@ -69,13 +70,22 @@ namespace Project.BLL.Repository
             }
         }
 
-        public async Task ReturnEmployeeAsync(Employee employee)
+        public async Task ReturnAsync(Employee employee)
         {
-            employee.IsDeleted = false;
-            await db.SaveChangesAsync();
+            var data = await db.Employees.FindAsync(employee.Employee_Id);
+            if (data != null)
+            {
+                data.IsDeleted = false;
+                data.IsActive = true;
+                await db.SaveChangesAsync();
+            }
+            else
+            {
+                throw new ArgumentNullException("Employee Not Found");
+            }
         }
 
-        public async Task FinalDeleteAsync(Employee employee)
+        public async Task DeleteAsync(Employee employee)
         {
             db.Employees.Remove(employee);
             await db.SaveChangesAsync();

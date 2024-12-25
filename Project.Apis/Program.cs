@@ -1,8 +1,13 @@
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Project.BLL.Handlers.EmployeeHandlers;
 using Project.BLL.Mapper;
+using Project.BLL.Queries.EmployeeQueries;
 using Project.BLL.Repository;
 using Project.BLL.Services;
 using Project.DAL.ConnectionData;
+using Project.DAL.Entities;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,12 +45,28 @@ options.UseSqlServer(connectionstring));
 builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()));
 
 //Add Cors => (Cross Origin Resource Shareing)
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", builder =>
+    {
+        builder.WithOrigins("https://localhost:44349")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+});
 
 // Add Scoped for appling DI
-builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
+//builder.Services.AddScoped<IServicesRepo<Employee>, EmployeeRepo>();
 
-builder.Services.AddScoped<IDepartmentRepo, DepartmentRepo>();
+builder.Services.AddScoped<IServicesRepo<Department>, DepartmentRepo>();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
+    Assembly.GetExecutingAssembly(),
+    typeof(GetAllEmployeesQuery).Assembly,
+    typeof(GetAllEmployeesQueryHandler).Assembly
+));
+
+
 
 var app = builder.Build();
 
@@ -56,10 +77,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(option => option
-.AllowAnyOrigin()
-.AllowAnyMethod()
-.AllowAnyHeader());
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 

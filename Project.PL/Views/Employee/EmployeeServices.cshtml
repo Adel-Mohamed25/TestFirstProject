@@ -75,16 +75,16 @@
                                 @foreach (var item in Model)
                                 {
                                     <tr>
-                                        <td><img src="~/Files/Imgs/@item.ImageName" height="50" width="50" /></td>
+                                        <td><img src="~/Files/Images/@item.ImageName" height="50" width="50" /></td>
                                         <td>@item.Employee_Fname @item.Employee_Lname</td>
                                         <td>@item.Employee_Salary</td>
                                         <td>@item.HireDate.ToShortDateString()</td>
-                                        <td><a href="~/Files/Docs/@item.CVName" download="Download">@Localizer["DownloadCV"]</a></td>
+                                        <td><a href="~/Files/Documents/@item.CVName" download="Download">@Localizer["DownloadCV"]</a></td>
                                         <td>@item.Department?.Department_Name</td>
                                         <td>@item.District?.District_Name</td>
                                         <td><a asp-action="Details" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-success">@Localizer["Details"]</a></td>
                                         <td><a asp-action="Update" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-warning">@Localizer["Update"]</a></td>
-                                        <td><a asp-action="Delete" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-danger">@Localizer["Delete"]</a></td>
+                                        <td><a asp-action="SoftDelete" asp-controller="Employee" asp-route-id="@item.Employee_Id" class="btn btn-danger">@Localizer["Delete"]</a></td>
                                     </tr>
                                 }
                             </tbody>

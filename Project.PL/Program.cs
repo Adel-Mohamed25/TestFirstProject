@@ -7,6 +7,7 @@ using Project.BLL.Mapper;
 using Project.BLL.Repository;
 using Project.BLL.Services;
 using Project.DAL.ConnectionData;
+using Project.DAL.Entities;
 using Project.DAL.Extend;
 using Project.PL.Languages;
 using System.Globalization;
@@ -51,9 +52,11 @@ builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()))
 
 
 // Add Scoped for appling DI
-builder.Services.AddScoped<IDepartmentRepo, DepartmentRepo>();
+builder.Services.AddScoped<IServicesRepo<Department>, DepartmentRepo>();
 
-builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
+builder.Services.AddScoped<IServicesRepo<Employee>, EmployeeRepo>();
+
+builder.Services.AddScoped<EmployeeRepo>();
 
 builder.Services.AddScoped<IDistrictRepo, DistrictRepo>();
 
@@ -94,6 +97,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 // Add Confirmed Account
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
 
@@ -104,9 +108,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     // Default Password settings.
-
     options.User.RequireUniqueEmail = true;
-
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = true;
@@ -140,6 +142,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=User}/{action=SignIn}/{id?}");
+    pattern: "{controller=Account}/{action=SignIn}/{id?}");
 
 app.Run();

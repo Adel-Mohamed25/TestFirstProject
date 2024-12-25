@@ -1,0 +1,26 @@
+﻿@model IdentityRole
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Layout/MainLayout.cshtml";
+}
+
+<form asp-action="Create" asp-controller="Roles" class="form-group">
+    <div asp-validation-summary="All" class="text-danger font-"></div>
+    <br />
+    <label asp-for="Name">Role Name</label>
+    <br />
+    <input type="text" asp-for="Name" placeholder="Enter Role Name here" class="form-control" />
+    <span asp-validation-for="Name"  class="text-danger font-bold"></span>
+    <br />
+    <center>
+        <input type="submit" value="Save" class="btn btn-success" />
+        <input type="reset" value="Reset" class="btn btn-warning" />
+        <a asp-controller="Roles" asp-action="GetRoles" class="btn btn-danger">Cancel</a>
+    </center>
+</form>
+
+@section JqueryValidation {
+        <script src="~/plugins/jquery-validation/jquery.validate.js"></script>
+        <script src="~/plugins/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+

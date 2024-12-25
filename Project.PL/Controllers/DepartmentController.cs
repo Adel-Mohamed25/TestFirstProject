@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project.BLL.Model;
 using Project.BLL.Services;
@@ -6,14 +7,15 @@ using Project.DAL.Entities;
 
 namespace Project.PL.Controllers
 {
+    [Authorize(Roles = "Admin , Hr")]
     public class DepartmentController : Controller
     {
-        private readonly IDepartmentRepo depart;
+        private readonly IServicesRepo<Department> depart;
         private readonly IMapper mapper;
 
-        public DepartmentController(IDepartmentRepo department, IMapper mapper)
+        public DepartmentController(IServicesRepo<Department> depart, IMapper mapper)
         {
-            depart = department;
+            this.depart = depart;
             this.mapper = mapper;
         }
 
@@ -37,7 +39,8 @@ namespace Project.PL.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Department>(department);
-                    await depart.CreateDepartmentAsync(data);
+                    await depart.CreateAsync(data);
+
                     return RedirectToAction("DepartmentServices", "Department");
                 }
             }
@@ -51,14 +54,14 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var data = await depart.GetByAsync(dep => dep.Department_Id == id);
+            var data = await depart.GetByIdAsync(dep => dep.Department_Id == id);
             var result = mapper.Map<DepartmentVM>(data);
             return View(result);
         }
 
         public async Task<IActionResult> Update(int id)
         {
-            var data = await depart.GetByAsync(dep => dep.Department_Id == id);
+            var data = await depart.GetByIdAsync(dep => dep.Department_Id == id);
             var result = mapper.Map<DepartmentVM>(data);
             return View(result);
         }
@@ -71,7 +74,7 @@ namespace Project.PL.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Department>(department);
-                    await depart.UpdateDepartmentAsync(data);
+                    await depart.UpdateAsync(data);
                     return RedirectToAction("DepartmentServices", "Department");
                 }
             }
@@ -85,7 +88,7 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var data = await depart.GetByAsync(dep => dep.Department_Id == id);
+            var data = await depart.GetByIdAsync(dep => dep.Department_Id == id);
             var result = mapper.Map<DepartmentVM>(data);
             return View(result);
         }
@@ -98,7 +101,7 @@ namespace Project.PL.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Department>(department);
-                    await depart.DeleteDepartmentAsync(data);
+                    await depart.DeleteAsync(data);
                     return RedirectToAction("DepartmentServices", "Department");
                 }
             }

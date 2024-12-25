@@ -4,7 +4,39 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>84158ea6-6b42-4bd9-b7bd-7e80f7fe9346</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Files\Documents\31e5e6ad-379e-48d7-802e-7f1befd27b81Math.pdf">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Files\Documents\4767a6fe-3a8b-4740-bb25-7dc6448eadec2022-10-07 (2).png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Files\Documents\63981725-6fd9-4b21-bd2c-8ffb3ca367192022-10-29 (12).png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Files\Images\248f6da6-aa8c-484c-b214-826de12d63e4B612_20231113_084233_350.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Files\Images\588aa595-f0a5-4d6e-b726-dbe8821bd11aB612_20231113_084233_350.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Files\Images\868b3657-6209-4353-84e3-2259027e3897beuty.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Files\Images\b5ad1214-882d-433a-964b-f7c179df8f91B612_20231113_084233_350.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.8" />

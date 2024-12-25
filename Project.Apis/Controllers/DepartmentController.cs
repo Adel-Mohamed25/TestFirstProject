@@ -12,11 +12,11 @@ namespace Project.Apis.Controllers
     [ApiController]
     public class DepartmentController : ControllerBase
     {
-        private readonly IDepartmentRepo department;
+        private readonly IServicesRepo<Department> department;
         private readonly IMapper mapper;
         private readonly ApplicationDbContext db;
 
-        public DepartmentController(IDepartmentRepo department, IMapper mapper, ApplicationDbContext db)
+        public DepartmentController(IServicesRepo<Department> department, IMapper mapper, ApplicationDbContext db)
         {
             this.department = department;
             this.mapper = mapper;
@@ -60,7 +60,7 @@ namespace Project.Apis.Controllers
         {
             try
             {
-                var data = await department.GetByAsync(dep => dep.Department_Id == id);
+                var data = await department.GetByIdAsync(dep => dep.Department_Id == id);
                 var result = mapper.Map<DepartmentVM>(data);
                 //return Ok(new ApiResponse<DepartmentVM>()
                 //{
@@ -93,7 +93,7 @@ namespace Project.Apis.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Department>(Department);
-                    await department.CreateDepartmentAsync(data);
+                    await department.CreateAsync(data);
                     //return Ok(new ApiResponse<Department>()
                     //{
                     //    Code = 201,
@@ -133,7 +133,7 @@ namespace Project.Apis.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Department>(Department);
-                    await department.UpdateDepartmentAsync(data);
+                    await department.UpdateAsync(data);
                     //return Ok(new ApiResponse<Department>
                     //{
                     //    Code = 202,
@@ -170,7 +170,7 @@ namespace Project.Apis.Controllers
             try
             {
                 var data = mapper.Map<Department>(Department);
-                await department.DeleteDepartmentAsync(data);
+                await department.DeleteAsync(data);
                 //return Ok(new ApiResponse<Department>
                 //{
                 //    Code = 200,

@@ -1,0 +1,93 @@
+﻿@model SignUpVM
+@{
+    ViewData["Title"] = "SignUp";
+    Layout = "~/Views/Layout/UserLayout.cshtml";
+}
+
+<form asp-controller="Account" asp-action="SignUp" class="form-group">
+   <div asp-validation-summary="All" class="text-danger font-bold"></div>
+    <div class="msg">Register a new membership</div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="material-icons">person</i>
+        </span>
+        <div class="form-line">
+            <input type="text" asp-for="UserName" class="form-control" placeholder="Name Surname" required autofocus autocomplete="off">
+            <span asp-validation-for="UserName" class="text-danger font-bold"></span>
+        </div>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="material-icons">email</i>
+        </span>
+        <div class="form-line">
+            <input type="email" asp-for="Email" class="form-control" placeholder="Email Address" required autocomplete="off">
+            <span asp-validation-for="Email" class="text-danger font-bold"></span>
+        </div>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="material-icons">lock</i>
+        </span>
+        <div class="form-line">
+            <input type="password" asp-for="Password" class="form-control" minlength="8" placeholder="Password" required id="passwordField">
+            <div class="input-group-append">
+                <button type="button" id="passwordToggleButton" class="btn btn-outline-secondary" onclick="TogglePassword()">Show</button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger font-bold"></span>
+        </div>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="material-icons">lock</i>
+        </span>
+        <div class="form-line">
+            <input type="password" asp-for="ConfirmPassword" class="form-control" minlength="8" placeholder="Password" required id="confirmpasswordField">
+            <div class="input-group-append">
+                <button type="button" id="confirmpasswordToggleButton" class="btn btn-outline-secondary" onclick="ToggleConfirmPasswordPassword()">Show</button>
+            </div>
+            <span asp-validation-for="ConfirmPassword" class="text-danger font-bold"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="checkbox" asp-for="IAgree" class="filled-in chk-col-pink">
+        <label asp-for="IAgree">I read and agree to the <a href="javascript:void(0);">terms of usage</a>.</label>
+    </div>
+
+    <input type="submit" value="SIGN UP" class="btn btn-block btn-lg bg-pink waves-effect" />
+    <div class="m-t-25 m-b--5 align-center">
+        <a asp-controller="Account" asp-action="SignIn">You already have a membership?</a>
+    </div>
+</form>
+
+@section JqueryUserValidation {
+    <script src="~/plugins/jquery-validation/jquery.validate.js"></script>
+    <script src="~/plugins/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+<script>
+    function TogglePassword()
+    {
+        var passwordField = document.getElementById("passwordField");
+         var button = document.getElementById("passwordToggleButton");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            button.innerHTML = "Hide"; 
+        } else {
+            passwordField.type = "password";
+            button.innerHTML = "Show"; 
+        }
+    }
+
+    function ToggleConfirmPasswordPassword()
+    {
+        var passwordField = document.getElementById("confirmpasswordField"); 
+        var button = document.getElementById("confirmpasswordToggleButton"); 
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            button.innerHTML = "Hide"; 
+        } else {
+            passwordField.type = "password";
+            button.innerHTML = "Show"; 
+        }
+    }
+</script>

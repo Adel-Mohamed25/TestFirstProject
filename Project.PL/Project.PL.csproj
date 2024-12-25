@@ -26,49 +26,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\css\materialize.css" />
-    <None Include="wwwroot\css\style.css" />
-    <None Include="wwwroot\css\style.min.css" />
-    <None Include="wwwroot\css\themes\all-themes.css" />
-    <None Include="wwwroot\css\themes\all-themes.min.css" />
-    <None Include="wwwroot\css\themes\theme-amber.css" />
-    <None Include="wwwroot\css\themes\theme-amber.min.css" />
-    <None Include="wwwroot\css\themes\theme-black.css" />
-    <None Include="wwwroot\css\themes\theme-black.min.css" />
-    <None Include="wwwroot\css\themes\theme-blue-grey.css" />
-    <None Include="wwwroot\css\themes\theme-blue-grey.min.css" />
-    <None Include="wwwroot\css\themes\theme-blue.css" />
-    <None Include="wwwroot\css\themes\theme-blue.min.css" />
-    <None Include="wwwroot\css\themes\theme-brown.css" />
-    <None Include="wwwroot\css\themes\theme-brown.min.css" />
-    <None Include="wwwroot\css\themes\theme-cyan.css" />
-    <None Include="wwwroot\css\themes\theme-cyan.min.css" />
-    <None Include="wwwroot\css\themes\theme-deep-orange.css" />
-    <None Include="wwwroot\css\themes\theme-deep-orange.min.css" />
-    <None Include="wwwroot\css\themes\theme-deep-purple.css" />
-    <None Include="wwwroot\css\themes\theme-deep-purple.min.css" />
-    <None Include="wwwroot\css\themes\theme-green.css" />
-    <None Include="wwwroot\css\themes\theme-green.min.css" />
-    <None Include="wwwroot\css\themes\theme-grey.css" />
-    <None Include="wwwroot\css\themes\theme-grey.min.css" />
-    <None Include="wwwroot\css\themes\theme-indigo.css" />
-    <None Include="wwwroot\css\themes\theme-indigo.min.css" />
-    <None Include="wwwroot\css\themes\theme-light-blue.css" />
-    <None Include="wwwroot\css\themes\theme-light-blue.min.css" />
-    <None Include="wwwroot\css\themes\theme-lime.css" />
-    <None Include="wwwroot\css\themes\theme-lime.min.css" />
-    <None Include="wwwroot\css\themes\theme-orange.css" />
-    <None Include="wwwroot\css\themes\theme-orange.min.css" />
-    <None Include="wwwroot\css\themes\theme-pink.css" />
-    <None Include="wwwroot\css\themes\theme-pink.min.css" />
-    <None Include="wwwroot\css\themes\theme-purple.css" />
-    <None Include="wwwroot\css\themes\theme-purple.min.css" />
-    <None Include="wwwroot\css\themes\theme-red.css" />
-    <None Include="wwwroot\css\themes\theme-red.min.css" />
-    <None Include="wwwroot\css\themes\theme-teal.css" />
-    <None Include="wwwroot\css\themes\theme-teal.min.css" />
-    <None Include="wwwroot\css\themes\theme-yellow.css" />
-    <None Include="wwwroot\css\themes\theme-yellow.min.css" />
+    <None Include="wwwroot\Files\Documents\0a78815c-d705-48d0-881a-3285d5a9c999images %281%29.jpeg" />
+    <None Include="wwwroot\Files\Documents\31e5e6ad-379e-48d7-802e-7f1befd27b81Math.pdf" />
+    <None Include="wwwroot\Files\Documents\3fcab1b7-d5f5-41af-8603-67f63b7030bcimages %281%29.jpeg" />
+    <None Include="wwwroot\Files\Documents\4767a6fe-3a8b-4740-bb25-7dc6448eadec2022-10-07 %282%29.png" />
+    <None Include="wwwroot\Files\Documents\630377ce-5098-4166-8939-d2002c523de8images.jpeg" />
+    <None Include="wwwroot\Files\Documents\63981725-6fd9-4b21-bd2c-8ffb3ca367192022-10-29 %2812%29.png" />
+    <None Include="wwwroot\Files\Documents\9865d75b-d43b-4d47-9fcb-38cb2ee99cb4images %281%29.jpeg" />
+    <None Include="wwwroot\Files\Images\0e133c52-e9c0-416e-8bb0-eb5c155d9c8bIMG_4011.jpg" />
+    <None Include="wwwroot\Files\Images\248f6da6-aa8c-484c-b214-826de12d63e4B612_20231113_084233_350.jpg" />
+    <None Include="wwwroot\Files\Images\5574e759-28c1-49ca-8713-a748b3af8960B612_20231113_084233_350.jpg" />
+    <None Include="wwwroot\Files\Images\588aa595-f0a5-4d6e-b726-dbe8821bd11aB612_20231113_084233_350.jpg" />
+    <None Include="wwwroot\Files\Images\756be9b9-0a59-4f4b-9224-9b7145a202e6beuty %282%29.jpg" />
+    <None Include="wwwroot\Files\Images\868b3657-6209-4353-84e3-2259027e3897beuty.jpg" />
+    <None Include="wwwroot\Files\Images\b5ad1214-882d-433a-964b-f7c179df8f91B612_20231113_084233_350.jpg" />
+    <None Include="wwwroot\Files\Images\ec1dd807-2a05-4267-b3b2-387a2c9738c1beuty %282%29.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -82,7 +54,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.8" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
 </Project>

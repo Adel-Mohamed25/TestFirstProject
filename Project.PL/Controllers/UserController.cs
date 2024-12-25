@@ -1,43 +1,69 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Project.BLL.Helper;
-using Project.BLL.Model;
+using Microsoft.EntityFrameworkCore;
 using Project.DAL.Extend;
+
 
 namespace Project.PL.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IMapper mapper;
 
-        public UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper)
+        public UserController(UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             this.userManager = userManager;
-            this.signInManager = signInManager;
             this.mapper = mapper;
         }
 
-
-        [HttpGet]
-        public IActionResult SignUp()
+        public IActionResult GetUsers()
         {
-            return View();
+            var data = userManager.Users.AsNoTracking().ToList();
+
+            return View(data);
+        }
+
+        public async Task<IActionResult> Details(string id)
+        {
+            var data = await userManager.FindByIdAsync(id);
+            if (data == null)
+            {
+                return NotFound();
+            }
+            return View(data);
+        }
+
+        public async Task<IActionResult> Update(string id)
+        {
+            var data = await userManager.FindByIdAsync(id);
+            if (data == null)
+            {
+                return NotFound();
+            }
+            return View(data);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignUp(SignUpVM signUpVM)
+        public async Task<IActionResult> Update(ApplicationUser model)
         {
             try
             {
-                var data = mapper.Map<ApplicationUser>(signUpVM);
-                var result = await userManager.CreateAsync(data, signUpVM.Password);
+                var user = await userManager.FindByIdAsync(model.Id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
+                mapper.Map(model, user);
+
+                var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("SignIn");
+                    return RedirectToAction("GetUsers");
                 }
                 else
                 {
@@ -47,125 +73,38 @@ namespace Project.PL.Controllers
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return View(signUpVM);
+                return View($"Error : {ex.Message}");
             }
-
-            return View(signUpVM);
+            return View(model);
         }
 
-        [HttpGet]
-        public IActionResult SignIn()
+
+        public async Task<IActionResult> Delete(string id)
         {
-            return View();
+            var data = await userManager.FindByIdAsync(id);
+            if (data == null)
+            {
+                return NotFound();
+            }
+            return View(data);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignIn(SignInVM signInVM)
+        public async Task<IActionResult> Delete(ApplicationUser model)
         {
             try
             {
-                var data = await userManager.FindByEmailAsync(signInVM.Email);
-                var result = await signInManager.PasswordSignInAsync(data.UserName, signInVM.Password, signInVM.RememberMe, false);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
+
+                var result = await userManager.DeleteAsync(model);
+                return RedirectToAction("GetUsers");
             }
-            catch
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", "Invalid Email or Password");
-                return View(signInVM);
+                return View($"Error : {ex.Message}");
             }
-            return View(signInVM);
         }
-
-        [HttpGet]
-        public async Task<IActionResult> Signout()
-        {
-            await signInManager.SignOutAsync();
-            return RedirectToAction("SignIn");
-        }
-
-        [HttpGet]
-        public IActionResult ForgetPassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ForgetPassword(ForgetPasswordVM forgetPassword)
-        {
-            try
-            {
-                var user = await userManager.FindByEmailAsync(forgetPassword.Email);
-                if (user != null)
-                {
-                    var token = await userManager.GeneratePasswordResetTokenAsync(user);
-
-                    var passwordresetlink = Url.Action("ResetPassword", "User", new { Email = forgetPassword.Email, Token = token }, Request.Scheme);
-
-                    MailSender.SendMail(new EmailVM { Title = "Link To Confirm Forget Password", Message = passwordresetlink, Email = forgetPassword.Email });
-
-                    return RedirectToAction("ConfirmForgetPassword");
-                }
-            }
-            catch
-            {
-                return View(forgetPassword);
-            }
-            return View(forgetPassword);
-        }
-
-        [HttpGet]
-        public IActionResult ConfirmForgetPassword()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult ResetPassword(string? Email, string? Token)
-        {
-            if (Email != null && Token != null)
-            {
-                return View();
-            }
-
-            return RedirectToAction("ForgetPassword");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordVM resetPassword)
-        {
-            var user = await userManager.FindByEmailAsync(resetPassword.Email);
-
-            if (user != null)
-            {
-                var result = await userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ConfirmResetPassword");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
-
-                return View(resetPassword);
-            }
-
-            return RedirectToAction("ConfirmResetPassword");
-        }
-
-        [HttpGet]
-        public IActionResult ConfirmResetPassword()
-        {
-            return View();
-        }
-
 
     }
 }

@@ -1,0 +1,69 @@
+﻿@model SignInVM
+@{
+    ViewData["Title"] = "SignIn";
+    Layout = "~/Views/Layout/UserLayout.cshtml";
+}
+
+<form asp-controller="Account" asp-action="SignIn" class="form-group">
+    <div asp-validation-summary="All" class="text-danger font-bold"></div>
+    <div class="msg">Sign in to start your session</div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="material-icons">person</i>
+        </span>
+        <div class="form-line">
+            <input type="email" asp-for="Email" class="form-control" placeholder="Email Address" required autocomplete="on">
+            <span asp-validation-for="Email" class="text-danger font-bold"></span>
+        </div>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="material-icons">lock</i>
+        </span>
+        <div class="form-line">
+            <input type="password" asp-for="Password" class="form-control" minlength="8" placeholder="Password" autocomplete="on" required id="passwordField">
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">Show</button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger font-bold"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8 p-t-5">
+            <input type="checkbox" asp-for="RememberMe" class="filled-in chk-col-pink">
+            <label asp-for="RememberMe">Remember Me</label>
+        </div>
+        <div class="col-xs-4">
+
+            <input type="submit" value="SIGN IN" class="btn btn-block bg-pink waves-effect" />
+        </div>
+    </div>
+    <div class="row m-t-15 m-b--20">
+        <div class="col-xs-6">
+            <a asp-controller="Account" asp-action="SignUp" >Register Now!</a>
+        </div>
+        <div class="col-xs-6 align-right">
+            <a asp-controller="Account" asp-action="ForgetPassword">Forgot Password?</a>
+        </div>
+    </div>
+</form>
+
+
+@section JqueryUserValidation {
+    <script src="~/plugins/jquery-validation/jquery.validate.js"></script>
+    <script src="~/plugins/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+<script>
+     function togglePassword()
+     {
+        var passwordField = document.getElementById("passwordField");
+        var button = document.querySelector("button");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            button.innerHTML = "Hide"; 
+        } else {
+            passwordField.type = "password";
+            button.innerHTML = "Show"; 
+        }
+    }
+</script>

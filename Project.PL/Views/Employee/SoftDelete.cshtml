@@ -1,0 +1,57 @@
+﻿@model EmployeeVM
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Layout/MainLayout.cshtml";
+}
+
+<form asp-action="SoftDelete" asp-controller="Employee" class="form-group">
+    <input type="hidden" asp-for="Employee_Id" class="form-control" />
+    <input type="hidden" asp-for="CVName" class="form-control" />
+    <input type="hidden" asp-for="ImageName" class="form-control" />
+    <input type="hidden" asp-for="CV" class="form-control" />
+    <input type="hidden" asp-for="Image" class="form-control" />
+
+    <label asp-for="Employee_Fname">@Localizer["FirstName"]</label>
+    <br />
+    <input type="text" asp-for="Employee_Fname" class="form-control" readonly />
+    <span asp-validation-for="Employee_Fname" class="text-danger font-bold"></span>
+    <br />
+    <label asp-for="Employee_Lname">@Localizer["LastName"]</label>
+    <br />
+    <input type="text" asp-for="Employee_Lname" class="form-control" readonly />
+    <span asp-validation-for="Employee_Fname" class="text-danger font-bold"></span>
+    <br />
+    <label asp-for="Address">@Localizer["Address"]</label>
+    <br />
+    <input type="text" asp-for="Address" class="form-control" readonly />
+    <span asp-validation-for="Address" class="text-danger font-bold"></span>
+    <br />
+    <label asp-for="Employee_Email">@Localizer["Email"]</label>
+    <br />
+    <input type="email" asp-for="Employee_Email" class="form-control" readonly />
+    <span asp-validation-for="Employee_Fname" class="text-danger font-bold"></span>
+    <br />
+    <label asp-for="Employee_Phone">@Localizer["PhoneNumber"]</label>
+    <br />
+    <input type="text" asp-for="Employee_Phone" class="form-control" readonly />
+    <span asp-validation-for="Employee_Fname" class="text-danger font-bold"></span>
+    <br />
+    <label asp-for="Employee_Salary">@Localizer["Salary"]</label>
+    <br />
+    <input type="text" asp-for="Employee_Salary" class="form-control" readonly />
+    <span asp-validation-for="Employee_Fname" class="text-danger font-bold"></span>
+    <br />
+    <label asp-for="HireDate">@Localizer["HireDate"]</label>
+    <br />
+    <input type="date" asp-for="HireDate" class="form-control" readonly />
+    <span asp-validation-for="Employee_Fname" class="text-danger font-bold"></span>
+    <label asp-for="CreationDate">@Localizer["CreationDate"]</label>
+    <br />
+    <input type="date" asp-for="CreationDate" class="form-control" readonly />
+    <br />
+    <center>
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-controller="Employee" asp-action="EmployeeServices" class="btn btn-success">@Localizer["Cancel"]</a>
+    </center>
+
+</form>

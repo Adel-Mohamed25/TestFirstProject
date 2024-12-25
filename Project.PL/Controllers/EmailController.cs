@@ -18,14 +18,15 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    ViewBag.Message = MailSender.SendMail(model);
+                    ViewBag.Message = MailSender.SendMessageToMail(model);
+                    return RedirectToAction("SendEmail");
                 }
             }
             catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
             }
-            return View(model);
+            return View();
         }
 
     }

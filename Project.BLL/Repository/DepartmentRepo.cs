@@ -2,7 +2,7 @@
 
 namespace Project.BLL.Repository
 {
-    public class DepartmentRepo : IDepartmentRepo
+    public class DepartmentRepo : IServicesRepo<Department>
     {
         private readonly ApplicationDbContext db;
         public DepartmentRepo(ApplicationDbContext db)
@@ -21,7 +21,7 @@ namespace Project.BLL.Repository
                                      .ToListAsync();
         }
 
-        public async Task<Department> GetByAsync(Expression<Func<Department, bool>> filter)
+        public async Task<Department> GetByIdAsync(Expression<Func<Department, bool>> filter)
         {
             var data = await db.Departments.AsNoTracking()
                                          .Where(filter)
@@ -32,19 +32,19 @@ namespace Project.BLL.Repository
             return data;
         }
 
-        public async Task CreateDepartmentAsync(Department department)
+        public async Task CreateAsync(Department department)
         {
             await db.Departments.AddAsync(department);
             await db.SaveChangesAsync();
         }
 
-        public async Task DeleteDepartmentAsync(Department department)
+        public async Task DeleteAsync(Department department)
         {
             db.Departments.Remove(department);
             await db.SaveChangesAsync();
         }
 
-        public async Task UpdateDepartmentAsync(Department department)
+        public async Task UpdateAsync(Department department)
         {
             db.Entry(department).State = EntityState.Modified;
             await db.SaveChangesAsync();

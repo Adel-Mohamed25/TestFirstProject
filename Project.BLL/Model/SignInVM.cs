@@ -8,12 +8,12 @@ namespace Project.BLL.Model
         [Required(ErrorMessage = "Email Is Required")]
         [MinLength(20, ErrorMessage = "MinLength 20 char")]
         [EmailAddress(ErrorMessage = "Not Vaild Email")]
+        //[CustomAutoComplete("on")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Password Is Required")]
         [MinLength(8, ErrorMessage = "MinLength 8 char")]
-        [RegularExpression(@"^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must contain at least one letter, one number, and one special character.")]
-        [PasswordPropertyText()]
+        [PasswordPropertyText(true)]
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }

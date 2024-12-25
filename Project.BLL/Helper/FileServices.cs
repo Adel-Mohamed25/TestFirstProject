@@ -4,9 +4,17 @@ namespace Project.BLL.Helper
 {
     public static class FileServices
     {
-        public static string UploadFile(this IFormFile formFile, string foldername)
+        public static string UploadFile(this IFormFile formFile, string foldername, string root = null)
         {
-            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Files", foldername);
+            string filepath;
+            if (root == null)
+            {
+                filepath = Path.Combine(Directory.GetCurrentDirectory(), "Files", foldername);
+            }
+            else
+            {
+                filepath = Path.Combine(Directory.GetCurrentDirectory(), root, "Files", foldername);
+            }
 
             var filename = Guid.NewGuid() + Path.GetFileName(formFile.FileName);
 
@@ -20,11 +28,20 @@ namespace Project.BLL.Helper
             return filename;
         }
 
-        public static string RemoveFile(this IFormFile formFile, string foldername)
+        public static string RemoveFile(this IFormFile formFile, string foldername, string root = null)
         {
             try
             {
-                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Files", foldername, formFile.FileName);
+                string filepath;
+                if (root == null)
+                {
+                    filepath = Path.Combine(Directory.GetCurrentDirectory(), "Files", foldername, formFile.FileName);
+                }
+                else
+                {
+                    filepath = Path.Combine(Directory.GetCurrentDirectory(), root, "Files", foldername, formFile.FileName);
+                }
+
                 if (File.Exists(filepath))
                 {
                     File.Delete(filepath);

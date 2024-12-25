@@ -1,4 +1,5 @@
-﻿using Project.BLL.Model;
+﻿using Project.BLL.DTO;
+using Project.BLL.Model;
 using Project.DAL.Extend;
 namespace Project.BLL.Mapper
 {
@@ -24,6 +25,11 @@ namespace Project.BLL.Mapper
             CreateMap<SignUpVM, ApplicationUser>();
             CreateMap<ApplicationUser, SignUpVM>();
 
+            CreateMap<ApplicationUser, ApplicationUser>()
+           .ForMember(dest => dest.Id, opt => opt.Ignore());
+
+            CreateMap<Employee, EmployeeDTO>();
+            CreateMap<EmployeeDTO, Employee>();
 
         }
     }
