@@ -6,8 +6,8 @@ namespace Project.BLL.Services
     {
         Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>>? filter = null);
         Task<T> GetByIdAsync(Expression<Func<T, bool>> filter);
-        Task CreateAsync(T department);
-        Task UpdateAsync(T department);
-        Task DeleteAsync(T department);
+        Task CreateAsync(T entity);
+        Task UpdateAsync(T entity);
+        Task DeleteAsync(T entity);
     }
 }

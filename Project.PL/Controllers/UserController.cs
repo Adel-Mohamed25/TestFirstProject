@@ -20,9 +20,9 @@ namespace Project.PL.Controllers
             this.mapper = mapper;
         }
 
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
-            var data = userManager.Users.AsNoTracking().ToList();
+            var data = await userManager.Users.AsNoTracking().ToListAsync();
 
             return View(data);
         }

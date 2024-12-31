@@ -9,14 +9,14 @@ namespace Project.BLL.Model
         [MinLength(8, ErrorMessage = "MinLength 8 char")]
         [RegularExpression(@"^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must contain at least one letter, one number, and one special character.")]
         [PasswordPropertyText()]
-        public string Password { get; set; }
+        public required string Password { get; set; }
 
         [Required(ErrorMessage = "Confirm Password Is Required")]
         [MinLength(8, ErrorMessage = "MinLength 8 char")]
         [RegularExpression(@"^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must contain at least one letter, one number, and one special character.")]
         [Compare("Password", ErrorMessage = "Password Not Matching")]
         [PasswordPropertyText()]
-        public string ConfirmPassword { get; set; }
+        public required string ConfirmPassword { get; set; }
 
         public string? Email { get; set; }
 

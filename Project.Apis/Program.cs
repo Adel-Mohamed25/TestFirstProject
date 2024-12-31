@@ -1,5 +1,8 @@
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Project.BLL.Handlers.EmployeeHandlers;
 using Project.BLL.Mapper;
 using Project.BLL.Queries.EmployeeQueries;
@@ -7,7 +10,9 @@ using Project.BLL.Repository;
 using Project.BLL.Services;
 using Project.DAL.ConnectionData;
 using Project.DAL.Entities;
+using Project.DAL.Extend;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,24 +46,68 @@ var connectionstring = builder.Configuration.GetConnectionString("ApplicationCon
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(connectionstring));
 
-// Add Automapper  
-builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()));
-
 //Add Cors => (Cross Origin Resource Shareing)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        builder.WithOrigins("https://localhost:44349")
+        builder.WithOrigins("https://localhost:44349/")
         .AllowAnyMethod()
         .AllowAnyHeader();
     });
 });
 
-// Add Scoped for appling DI
-//builder.Services.AddScoped<IServicesRepo<Employee>, EmployeeRepo>();
+// Add Identity for User and Role.
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 0;
 
-builder.Services.AddScoped<IServicesRepo<Department>, DepartmentRepo>();
+}).AddEntityFrameworkStores<ApplicationDbContext>()
+   .AddDefaultTokenProviders();
+
+
+// Add Authentication for User.
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:IssuerUrl"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:AudienceUrl"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecurityKey"]))
+    };
+});
+
+// Add Automapper  
+builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()));
+
+// Add Logging
+builder.Services.AddLogging();
+
+// Add Scoped for appling DI
+
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+
+builder.Services.AddScoped<IServicesRepo<Employee>, EmployeeRepo>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<EmployeeRepo>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
     Assembly.GetExecutingAssembly(),

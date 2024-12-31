@@ -1,4 +1,5 @@
-﻿namespace Project.BLL.Model
+﻿
+namespace Project.BLL.Model
 {
     public class CountryVM
     {

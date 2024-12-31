@@ -50,11 +50,15 @@ options.UseSqlServer(connectionstring));
 // Add Automapper  
 builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()));
 
+// Add Logging
+builder.Services.AddLogging();
 
 // Add Scoped for appling DI
 builder.Services.AddScoped<IServicesRepo<Department>, DepartmentRepo>();
 
 builder.Services.AddScoped<IServicesRepo<Employee>, EmployeeRepo>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<EmployeeRepo>();
 

@@ -1,41 +1,31 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project.BLL.Commands.EmployeeCommands;
-using Project.BLL.DTO;
 using Project.BLL.Helper;
 using Project.BLL.Model;
 using Project.BLL.Queries.EmployeeQueries;
 using Project.DAL.Entities;
+using System.Net;
 
 
 namespace Project.Apis.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    [Authorize(Roles = "Admin,Hr")]
+    public class EmployeeController : BaseController
     {
-        private readonly IMapper mapper;
-        private readonly IMediator mediator;
-
-        public EmployeeController(IMapper mapper, IMediator mediator)
-        {
-            this.mapper = mapper;
-            this.mediator = mediator;
-        }
-
-
         [HttpGet]
-        [Route("~/api/Employee/GetEmployees")]
+        [Route("GetEmployees")]
         public async Task<IActionResult> GetEmployees()
         {
             try
             {
                 var data = await mediator.Send(new GetAllEmployeesQuery());
                 var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
-                return Ok(new ApiResponse<IEnumerable<EmployeeVM>>()
+                return Ok(new Response<IEnumerable<EmployeeVM>>()
                 {
-                    Code = 200,
+                    Code = HttpStatusCode.OK,
                     Status = "Ok",
                     Message = "Succed",
                     Data = result
@@ -43,9 +33,9 @@ namespace Project.Apis.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new ApiResponse<string>()
+                return NotFound(new Response<string>()
                 {
-                    Code = 404,
+                    Code = HttpStatusCode.NotFound,
                     Status = "Not Found",
                     Message = "Not Found",
                     Data = ex.Message
@@ -54,16 +44,16 @@ namespace Project.Apis.Controllers
         }
 
         [HttpGet]
-        [Route("~/api/Employee/GetEmployeeById/{id}")]
+        [Route("GetEmployeeById/{id}")]
         public async Task<IActionResult> GetEmployeeById([FromRoute] int id)
         {
             try
             {
                 var data = await mediator.Send(new GetEmployeeByIdQuery(id));
                 var result = mapper.Map<EmployeeVM>(data);
-                return Ok(new ApiResponse<EmployeeVM>()
+                return Ok(new Response<EmployeeVM>()
                 {
-                    Code = 200,
+                    Code = HttpStatusCode.OK,
                     Status = "Ok",
                     Message = "Succed",
                     Data = result
@@ -71,9 +61,9 @@ namespace Project.Apis.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new ApiResponse<string>()
+                return NotFound(new Response<string>()
                 {
-                    Code = 404,
+                    Code = HttpStatusCode.NotFound,
                     Status = "Not Found",
                     Message = "Not Found",
                     Data = ex.Message
@@ -82,7 +72,7 @@ namespace Project.Apis.Controllers
         }
 
         [HttpPost]
-        [Route("~/api/Employee/PostEmployee")]
+        [Route("PostEmployee")]
         public async Task<IActionResult> PostEmployee([FromBody] EmployeeVM employee)
         {
             try
@@ -91,19 +81,20 @@ namespace Project.Apis.Controllers
                 {
                     employee.CVName = employee.CV?.UploadFile("Documents");
                     employee.ImageName = employee.Image?.UploadFile("Images");
-                    var data = mapper.Map<EmployeeDTO>(employee);
+                    var data = mapper.Map<Employee>(employee);
                     await mediator.Send(new CreateEmployeeCommand(data));
-                    return Ok(new ApiResponse<EmployeeDTO>()
+                    return Ok(new Response<Employee>()
                     {
-                        Code = 201,
+                        Code = HttpStatusCode.Created,
                         Status = "Create",
                         Message = "Data Saved",
                         Data = data
                     });
+
                 }
-                return BadRequest(new ApiResponse<string>()
+                return BadRequest(new Response<string>()
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.NotFound,
                     Status = "Not Created",
                     Message = "Validation Erorr",
                 });
@@ -111,9 +102,9 @@ namespace Project.Apis.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponse<string>()
+                return BadRequest(new Response<string>()
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Created",
                     Message = "Not Created",
                     Data = ex.Message
@@ -122,7 +113,7 @@ namespace Project.Apis.Controllers
         }
 
         [HttpPut]
-        [Route("~/api/Employee/PutEmployee")]
+        [Route("PutEmployee")]
         public async Task<IActionResult> PutEmployee([FromBody] EmployeeVM employee)
         {
             try
@@ -131,26 +122,26 @@ namespace Project.Apis.Controllers
                 {
                     var data = mapper.Map<Employee>(employee);
                     await mediator.Send(new UpdateEmployeeCommand(data));
-                    return Ok(new ApiResponse<Employee>
+                    return Ok(new Response<Employee>
                     {
-                        Code = 202,
+                        Code = HttpStatusCode.Accepted,
                         Message = "Updated",
                         Status = "Accepted",
                         Data = data
                     });
                 }
-                return BadRequest(new ApiResponse<string>
+                return BadRequest(new Response<string>
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Updated",
                     Message = "Validation Error",
                 });
             }
             catch (Exception ex)
             {
-                return NotFound(new ApiResponse<string>
+                return NotFound(new Response<string>
                 {
-                    Code = 304,
+                    Code = HttpStatusCode.NotModified,
                     Status = "Not Modified",
                     Message = "Not Modified",
                     Data = ex.Message
@@ -160,16 +151,16 @@ namespace Project.Apis.Controllers
         }
 
         [HttpDelete]
-        [Route("~/api/Employee/SoftDeleteEmployee")]
+        [Route("SoftDeleteEmployee")]
         public async Task<IActionResult> SoftDeleteEmployee([FromBody] EmployeeVM employee)
         {
             try
             {
                 var data = mapper.Map<Employee>(employee);
                 await mediator.Send(new SoftDeleteEmployeeCommand(data));
-                return Ok(new ApiResponse<Employee>
+                return Ok(new Response<Employee>
                 {
-                    Code = 200,
+                    Code = HttpStatusCode.OK,
                     Status = "Deleted",
                     Message = "Data Is Deleted",
                     Data = data
@@ -177,9 +168,9 @@ namespace Project.Apis.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return BadRequest(new Response<string>
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Deleted",
                     Message = "Data Not Deleted",
                     Data = ex.Message
@@ -188,7 +179,7 @@ namespace Project.Apis.Controllers
         }
 
         [HttpDelete]
-        [Route("~/api/Employee/DeleteEmployee")]
+        [Route("DeleteEmployee")]
         public async Task<IActionResult> DeleteEmployee([FromBody] EmployeeVM employee)
         {
             try
@@ -197,9 +188,9 @@ namespace Project.Apis.Controllers
                 employee.Image?.RemoveFile("Images");
                 var data = mapper.Map<Employee>(employee);
                 await mediator.Send(new DeleteEmployeeCommand(data));
-                return Ok(new ApiResponse<Employee>
+                return Ok(new Response<Employee>
                 {
-                    Code = 200,
+                    Code = HttpStatusCode.OK,
                     Status = "Deleted",
                     Message = "Data Is Deleted",
                     Data = data
@@ -207,9 +198,9 @@ namespace Project.Apis.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return BadRequest(new Response<string>
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Deleted",
                     Message = "Data Not Deleted",
                     Data = ex.Message

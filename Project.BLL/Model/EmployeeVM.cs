@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Project.BLL.Model
 {
@@ -54,10 +55,12 @@ namespace Project.BLL.Model
 
         public int? Department_Id { get; set; }
 
+        [JsonIgnore]
         public Department? Department { get; set; }
 
         public int? District_Id { get; set; }
 
+        [JsonIgnore]
         public District? District { get; set; }
     }
 }

@@ -16,8 +16,7 @@ namespace Project.BLL.Handlers.EmployeeHandlers
 
         public async Task Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            var data = mapper.Map<Employee>(request.Employee);
-            await employee.CreateAsync(data);
+            await employee.CreateAsync(request.Employee);
         }
     }
 }

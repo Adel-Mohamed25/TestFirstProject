@@ -23,9 +23,7 @@ namespace Project.BLL.Repository
 
         public async Task<Department> GetByIdAsync(Expression<Func<Department, bool>> filter)
         {
-            var data = await db.Departments.AsNoTracking()
-                                         .Where(filter)
-                                         .FirstOrDefaultAsync();
+            var data = await db.Departments.AsNoTracking().Where(filter).FirstOrDefaultAsync();
 
             if (data == null)
                 throw new ArgumentNullException("No Result");

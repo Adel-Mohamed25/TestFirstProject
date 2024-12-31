@@ -1,52 +1,39 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Project.BLL.Commands.DepartmentCommands;
 using Project.BLL.Helper;
 using Project.BLL.Model;
-using Project.BLL.Services;
-using Project.DAL.ConnectionData;
+using Project.BLL.Queries.DepartmentQueries;
 using Project.DAL.Entities;
+using System.Net;
 
 namespace Project.Apis.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DepartmentController : ControllerBase
+    //[Authorize(Roles = "Admin,Hr")]
+    public class DepartmentController : BaseController
     {
-        private readonly IServicesRepo<Department> department;
-        private readonly IMapper mapper;
-        private readonly ApplicationDbContext db;
-
-        public DepartmentController(IServicesRepo<Department> department, IMapper mapper, ApplicationDbContext db)
-        {
-            this.department = department;
-            this.mapper = mapper;
-            this.db = db;
-        }
-
-
         [HttpGet]
-        [Route("~/api/Department/GetDepartments")]
+        [Route("GetDepartments")]
         public async Task<IActionResult> GetDepartments()
         {
             try
             {
-                var data = await department.GetAsync();
+                var data = await mediator.Send(new GetAllDepartmentsQuery());
                 var result = mapper.Map<IEnumerable<DepartmentVM>>(data);
-                //return Ok(new ApiResponse<IEnumerable<DepartmentVM>>()
-                //{
-                //    Code = 200,
-                //    Status = "Ok",
-                //    Message = "Succed",
-                //    Data = result
-                //});
-
-                return Ok(result);
+                return Ok(new Response<IEnumerable<DepartmentVM>>()
+                {
+                    Code = HttpStatusCode.OK,
+                    Status = "Ok",
+                    Message = "Succed",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return NotFound(new ApiResponse<string>()
+                return NotFound(new Response<string>()
                 {
-                    Code = 404,
+                    Code = HttpStatusCode.NotFound,
                     Status = "Not Found",
                     Message = "Not Found",
                     Data = ex.Message
@@ -55,28 +42,26 @@ namespace Project.Apis.Controllers
         }
 
         [HttpGet]
-        [Route("~/api/Department/GetDepartmentById/{id}")]
+        [Route("GetDepartmentById/{id}")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
             try
             {
-                var data = await department.GetByIdAsync(dep => dep.Department_Id == id);
+                var data = await mediator.Send(new GetDepartmentByIdQuery(id));
                 var result = mapper.Map<DepartmentVM>(data);
-                //return Ok(new ApiResponse<DepartmentVM>()
-                //{
-                //    Code = 200,
-                //    Status = "Ok",
-                //    Message = "Succed",
-                //    Data = result
-                //});
-
-                return Ok(result);
+                return Ok(new Response<DepartmentVM>()
+                {
+                    Code = HttpStatusCode.OK,
+                    Status = "Ok",
+                    Message = "Succed",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return NotFound(new ApiResponse<string>()
+                return NotFound(new Response<string>()
                 {
-                    Code = 404,
+                    Code = HttpStatusCode.NotFound,
                     Status = "Not Found",
                     Message = "Not Found",
                     Data = ex.Message
@@ -85,7 +70,7 @@ namespace Project.Apis.Controllers
         }
 
         [HttpPost]
-        [Route("~/api/Department/PostDepartment")]
+        [Route("PostDepartment")]
         public async Task<IActionResult> PostDepartment(DepartmentVM Department)
         {
             try
@@ -93,20 +78,18 @@ namespace Project.Apis.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Department>(Department);
-                    await department.CreateAsync(data);
-                    //return Ok(new ApiResponse<Department>()
-                    //{
-                    //    Code = 201,
-                    //    Status = "Create",
-                    //    Message = "Data Saved",
-                    //    Data = data
-                    //});
-
-                    return Ok();
+                    await mediator.Send(new CreateDepartmentCommand(data));
+                    return Ok(new Response<Department>()
+                    {
+                        Code = HttpStatusCode.Created,
+                        Status = "Create",
+                        Message = "Data Saved",
+                        Data = data
+                    });
                 }
-                return BadRequest(new ApiResponse<string>()
+                return BadRequest(new Response<string>()
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Created",
                     Message = "Validation Erorr",
                 });
@@ -114,9 +97,9 @@ namespace Project.Apis.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponse<string>()
+                return BadRequest(new Response<string>()
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Created",
                     Message = "Not Created",
                     Data = ex.Message
@@ -125,7 +108,7 @@ namespace Project.Apis.Controllers
         }
 
         [HttpPut]
-        [Route("~/api/Department/PutDepartment")]
+        [Route("PutDepartment")]
         public async Task<IActionResult> PutDepartment(DepartmentVM Department)
         {
             try
@@ -133,28 +116,27 @@ namespace Project.Apis.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Department>(Department);
-                    await department.UpdateAsync(data);
-                    //return Ok(new ApiResponse<Department>
-                    //{
-                    //    Code = 202,
-                    //    Message = "Updated",
-                    //    Status = "Accepted",
-                    //    Data = data
-                    //});
-                    return Ok();
+                    await mediator.Send(new UpdateDepartmentCommand(data));
+                    return Ok(new Response<Department>
+                    {
+                        Code = HttpStatusCode.Accepted,
+                        Message = "Updated",
+                        Status = "Accepted",
+                        Data = data
+                    });
                 }
-                return BadRequest(new ApiResponse<string>
+                return BadRequest(new Response<string>
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Updated",
                     Message = "Validation Error",
                 });
             }
             catch (Exception ex)
             {
-                return NotFound(new ApiResponse<string>
+                return NotFound(new Response<string>
                 {
-                    Code = 304,
+                    Code = HttpStatusCode.NotModified,
                     Status = "Not Modified",
                     Message = "Not Modified",
                     Data = ex.Message
@@ -164,28 +146,26 @@ namespace Project.Apis.Controllers
         }
 
         [HttpDelete]
-        [Route("~/api/Department/DeleteDepartment")]
+        [Route("DeleteDepartment")]
         public async Task<IActionResult> DeleteDepartment(DepartmentVM Department)
         {
             try
             {
                 var data = mapper.Map<Department>(Department);
-                await department.DeleteAsync(data);
-                //return Ok(new ApiResponse<Department>
-                //{
-                //    Code = 200,
-                //    Status = "Deleted",
-                //    Message = "Data Is Deleted",
-                //    Data = data
-                //});
-
-                return Ok();
+                await mediator.Send(new DeleteDepartmentCommand(data));
+                return Ok(new Response<Department>
+                {
+                    Code = HttpStatusCode.OK,
+                    Status = "Deleted",
+                    Message = "Data Is Deleted",
+                    Data = data
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return BadRequest(new Response<string>
                 {
-                    Code = 400,
+                    Code = HttpStatusCode.BadRequest,
                     Status = "Not Deleted",
                     Message = "Data Not Deleted",
                     Data = ex.Message

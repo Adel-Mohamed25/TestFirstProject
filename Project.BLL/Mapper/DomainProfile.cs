@@ -31,6 +31,9 @@ namespace Project.BLL.Mapper
             CreateMap<Employee, EmployeeDTO>();
             CreateMap<EmployeeDTO, Employee>();
 
+            CreateMap<Department, DepartmentDTO>();
+            CreateMap<DepartmentDTO, Department>();
+
         }
     }
 }

@@ -8,6 +8,9 @@
 
     <div asp-validation-summary="All" class="text-danger font-bold"></div>
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="PasswordHash" />
+    <input type="hidden" asp-for="IAgree" />
+    <input type="hidden" asp-for="LockoutEnabled" />
     <input type="hidden" asp-for="ConcurrencyStamp" />
     <label asp-for="UserName">User Name</label>
     <br />
