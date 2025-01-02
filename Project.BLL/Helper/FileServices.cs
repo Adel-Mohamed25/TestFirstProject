@@ -4,7 +4,7 @@ namespace Project.BLL.Helper
 {
     public static class FileServices
     {
-        public static string UploadFile(this IFormFile formFile, string foldername, string root = null)
+        public static string UploadFile(this IFormFile formFile, string foldername, string? root = null)
         {
             string filepath;
             if (root == null)
@@ -28,7 +28,7 @@ namespace Project.BLL.Helper
             return filename;
         }
 
-        public static string RemoveFile(this IFormFile formFile, string foldername, string root = null)
+        public static string RemoveFile(this IFormFile formFile, string foldername, string? root = null)
         {
             try
             {

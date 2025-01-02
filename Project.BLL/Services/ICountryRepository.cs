@@ -2,7 +2,7 @@
 
 namespace Project.BLL.Services
 {
-    public interface ICountryRepo
+    public interface ICountryRepository
     {
         Task<IEnumerable<Country>> GetAsync(Expression<Func<Country, bool>>? filter = null);
     }

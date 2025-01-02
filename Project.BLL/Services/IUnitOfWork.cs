@@ -4,6 +4,9 @@
     {
         IDepartmentRepository Departments { get; }
         IEmployeeRepository Employees { get; }
+        ICityRepository Cities { get; }
+        ICountryRepository Countries { get; }
+        IDistrictRepository Districts { get; }
 
         Task<int> SaveChangesAsync();
     }

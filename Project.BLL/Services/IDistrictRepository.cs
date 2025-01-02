@@ -2,7 +2,7 @@
 
 namespace Project.BLL.Services
 {
-    public interface IDistrictRepo
+    public interface IDistrictRepository
     {
         Task<IEnumerable<District>> GetAsync(Expression<Func<District, bool>>? filter = null);
     }

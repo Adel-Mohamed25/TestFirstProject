@@ -15,7 +15,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -56,18 +55,8 @@ builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()))
 builder.Services.AddLogging();
 
 // Add Scoped for appling DI
-
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-
-builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-
-builder.Services.AddScoped<IDistrictRepo, DistrictRepo>();
-
-builder.Services.AddScoped<ICityRepo, CityRepo>();
-
-builder.Services.AddScoped<ICountryRepo, CountryRepo>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
     Assembly.GetExecutingAssembly(),

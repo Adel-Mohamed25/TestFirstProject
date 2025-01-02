@@ -9,6 +9,9 @@ namespace Project.BLL.Repository
 
         public IDepartmentRepository Departments { get; }
         public IEmployeeRepository Employees { get; }
+        public ICityRepository Cities { get; }
+        public ICountryRepository Countries { get; }
+        public IDistrictRepository Districts { get; }
 
         public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger)
         {
@@ -16,6 +19,9 @@ namespace Project.BLL.Repository
             _logger = logger;
             Departments = new DepartmentRepository(_context, _logger);
             Employees = new EmployeeRepository(_context, _logger);
+            Cities = new CityRepository(_context, _logger);
+            Districts = new DistrictRepository(_context, _logger);
+            Countries = new CountryRepository(_context, _logger);
         }
 
         public void Dispose()

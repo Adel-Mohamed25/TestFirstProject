@@ -1,6 +1,5 @@
 ﻿@using Project.BLL.Services
-@* @inject IDepartmentRepo department *@
-@inject ICountryRepo country
+@inject IUnitOfWork _unitOfWork
 @model EmployeeVM
 
 @{
@@ -80,7 +79,7 @@
 
     <select id="CountryList">
         <option>@Localizer["ChooseCountry"]</option>
-    @foreach (var item in await country.GetAsync())
+        @foreach (var item in await _unitOfWork.Countries.GetAsync())
         {
             <option value="@item.Country_Id">@item.Country_Name</option>
         }

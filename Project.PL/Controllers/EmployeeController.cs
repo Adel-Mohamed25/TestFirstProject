@@ -18,16 +18,14 @@ namespace Project.PL.Controllers
     public class EmployeeController : Controller
     {
         private readonly IMediator _mediator;
-        private readonly IMapper mapper;
-        private readonly ICityRepo city;
-        private readonly IDistrictRepo district;
+        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EmployeeController(IMediator mediator, IMapper mapper, ICityRepo city, IDistrictRepo district)
+        public EmployeeController(IMediator mediator, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mediator = mediator;
-            this.mapper = mapper;
-            this.city = city;
-            this.district = district;
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IActionResult> EmployeeServices(string searchvalue)
@@ -35,13 +33,13 @@ namespace Project.PL.Controllers
             if (searchvalue is null)
             {
                 var data = await _mediator.Send(new GetAllEmployeesQuery(emp => emp.IsActive == true && emp.IsDeleted == false));
-                var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
+                var result = _mapper.Map<IEnumerable<EmployeeVM>>(data);
                 return View(result);
             }
             else
             {
                 var data = await _mediator.Send(new GetAllEmployeesQuery(emp => (emp.Employee_Fname + emp.Employee_Lname).Contains(searchvalue) && emp.IsActive == true && emp.IsDeleted == false));
-                var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
+                var result = _mapper.Map<IEnumerable<EmployeeVM>>(data);
                 return View(result);
             }
 
@@ -61,9 +59,9 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    employee.CVName = employee.CV?.UploadFile("wwwroot", "Documents");
-                    employee.ImageName = employee.Image?.UploadFile("wwwroot", "Images");
-                    var data = mapper.Map<Employee>(employee);
+                    employee.CVName = employee.CV?.UploadFile("Documents", "wwwroot");
+                    employee.ImageName = employee.Image?.UploadFile("Images", "wwwroot");
+                    var data = _mapper.Map<Employee>(employee);
                     await _mediator.Send(new CreateEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
@@ -81,7 +79,7 @@ namespace Project.PL.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
-            var result = mapper.Map<EmployeeVM>(data);
+            var result = _mapper.Map<EmployeeVM>(data);
             return View(result);
         }
 
@@ -89,7 +87,7 @@ namespace Project.PL.Controllers
         public async Task<IActionResult> SoftDelete(int id)
         {
             var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
-            var result = mapper.Map<EmployeeVM>(data);
+            var result = _mapper.Map<EmployeeVM>(data);
             return View(result);
         }
 
@@ -100,7 +98,7 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var data = mapper.Map<Employee>(employee);
+                    var data = _mapper.Map<Employee>(employee);
                     await _mediator.Send(new SoftDeleteEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
@@ -118,7 +116,7 @@ namespace Project.PL.Controllers
             var departments = await _mediator.Send(new GetAllDepartmentsQuery());
             ViewBag.departmentlist = new SelectList(departments, "Department_Id", "Department_Name");
             var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
-            var result = mapper.Map<EmployeeVM>(data);
+            var result = _mapper.Map<EmployeeVM>(data);
             return View(result);
         }
 
@@ -131,7 +129,7 @@ namespace Project.PL.Controllers
                 {
                     //employee.CVName = employee.CV.UploadFile("Docs");
                     //employee.ImageName = employee.Image.UploadFile("Imgs");
-                    var data = mapper.Map<Employee>(employee);
+                    var data = _mapper.Map<Employee>(employee);
                     await _mediator.Send(new UpdateEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
@@ -149,7 +147,7 @@ namespace Project.PL.Controllers
             try
             {
                 var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
-                var result = mapper.Map<EmployeeVM>(data);
+                var result = _mapper.Map<EmployeeVM>(data);
                 return View(result);
             }
             catch (Exception ex)
@@ -166,9 +164,9 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    employee.CV?.RemoveFile("wwwroot", "Documents");
-                    employee.Image?.RemoveFile("wwwroot", "Images");
-                    var data = mapper.Map<Employee>(employee);
+                    employee.CV?.RemoveFile("Documents", "wwwroot");
+                    employee.Image?.RemoveFile("Images", "wwwroot");
+                    var data = _mapper.Map<Employee>(employee);
                     await _mediator.Send(new DeleteEmployeeCommand(data));
                     return RedirectToAction("DeletedEmployee", "Employee");
                 }
@@ -183,7 +181,7 @@ namespace Project.PL.Controllers
         public async Task<IActionResult> DeletedEmployee()
         {
             var data = await _mediator.Send(new GetAllEmployeesQuery(emp => emp.IsDeleted == true));
-            var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
+            var result = _mapper.Map<IEnumerable<EmployeeVM>>(data);
             return View(result);
         }
 
@@ -192,7 +190,7 @@ namespace Project.PL.Controllers
         {
             var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
 
-            var result = mapper.Map<EmployeeVM>(data);
+            var result = _mapper.Map<EmployeeVM>(data);
 
             return View(result);
         }
@@ -204,7 +202,7 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var data = mapper.Map<Employee>(employee);
+                    var data = _mapper.Map<Employee>(employee);
                     await _mediator.Send(new ReturnEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices");
                 }
@@ -220,16 +218,16 @@ namespace Project.PL.Controllers
         [HttpPost]
         public async Task<JsonResult> GetCitiesByCountryId(int countryid)
         {
-            var data = await city.GetAsync(cit => cit.Country_Id == countryid);
-            var result = mapper.Map<IEnumerable<CityVM>>(data);
+            var data = await _unitOfWork.Cities.GetAsync();
+            var result = _mapper.Map<IEnumerable<CityVM>>(data);
             return Json(result);
         }
 
         [HttpPost]
         public async Task<JsonResult> GetDistrictsByCityId(int cityid)
         {
-            var data = await district.GetAsync(dis => dis.City_Id == cityid);
-            var result = mapper.Map<IEnumerable<DistrictVM>>(data);
+            var data = await _unitOfWork.Districts.GetAsync(dis => dis.City_Id == cityid);
+            var result = _mapper.Map<IEnumerable<DistrictVM>>(data);
             return Json(result);
         }
 
