@@ -5,15 +5,15 @@ namespace Project.BLL.Handlers.EmployeeHandlers
 {
     public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery, Employee>
     {
-        private readonly IServicesRepo<Employee> employee;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetEmployeeByIdQueryHandler(IServicesRepo<Employee> employee)
+        public GetEmployeeByIdQueryHandler(IUnitOfWork unitOfWork)
         {
-            this.employee = employee;
+            _unitOfWork = unitOfWork;
         }
         public async Task<Employee> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
         {
-            return await employee.GetByIdAsync(emp => emp.Employee_Id == request.Id);
+            return await _unitOfWork.Employees.GetByIdAsync(emp => emp.Employee_Id == request.Id);
         }
     }
 }

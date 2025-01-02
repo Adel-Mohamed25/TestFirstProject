@@ -6,16 +6,16 @@ namespace Project.BLL.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<UnitOfWork> _logger;
-        //public IGenericRepository<Department> Departments { get; }
-        public IGenericRepository<Employee> Employees { get; }
+
         public IDepartmentRepository Departments { get; }
+        public IEmployeeRepository Employees { get; }
 
         public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger)
         {
             _context = context;
             _logger = logger;
             Departments = new DepartmentRepository(_context, _logger);
-            Employees = new GenericRepository<Employee>(_context);
+            Employees = new EmployeeRepository(_context, _logger);
         }
 
         public void Dispose()

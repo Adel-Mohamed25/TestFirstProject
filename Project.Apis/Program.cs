@@ -9,7 +9,6 @@ using Project.BLL.Queries.EmployeeQueries;
 using Project.BLL.Repository;
 using Project.BLL.Services;
 using Project.DAL.ConnectionData;
-using Project.DAL.Entities;
 using Project.DAL.Extend;
 using System.Reflection;
 using System.Text;
@@ -103,11 +102,8 @@ builder.Services.AddLogging();
 
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 
-builder.Services.AddScoped<IServicesRepo<Employee>, EmployeeRepo>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-builder.Services.AddScoped<EmployeeRepo>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
     Assembly.GetExecutingAssembly(),

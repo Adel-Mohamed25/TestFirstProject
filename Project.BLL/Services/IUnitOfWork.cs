@@ -2,11 +2,8 @@
 {
     public interface IUnitOfWork : IDisposable
     {
-        //IGenericRepository<Department> Departments { get; }
-
-        public IDepartmentRepository Departments { get; }
-
-        IGenericRepository<Employee> Employees { get; }
+        IDepartmentRepository Departments { get; }
+        IEmployeeRepository Employees { get; }
 
         Task<int> SaveChangesAsync();
     }

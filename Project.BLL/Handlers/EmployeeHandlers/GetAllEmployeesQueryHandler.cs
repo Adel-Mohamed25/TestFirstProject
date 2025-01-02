@@ -5,16 +5,16 @@ namespace Project.BLL.Handlers.EmployeeHandlers
 {
     public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery, IEnumerable<Employee>>
     {
-        private readonly IServicesRepo<Employee> employee;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetAllEmployeesQueryHandler(IServicesRepo<Employee> employee)
+        public GetAllEmployeesQueryHandler(IUnitOfWork unitOfWork)
         {
-            this.employee = employee;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Employee>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
         {
-            return await employee.GetAsync();
+            return await _unitOfWork.Employees.GetAsync(request.filter);
         }
     }
 }

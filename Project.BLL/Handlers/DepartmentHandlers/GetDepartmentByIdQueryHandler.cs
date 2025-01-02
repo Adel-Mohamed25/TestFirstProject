@@ -13,7 +13,7 @@ namespace Project.BLL.Handlers.DepartmentHandlers
         }
         public async Task<Department> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.Departments.GetByIdAsync(request.Id);
+            return await _unitOfWork.Departments.GetByIdAsync(dep => dep.Department_Id == request.Id);
         }
     }
 }

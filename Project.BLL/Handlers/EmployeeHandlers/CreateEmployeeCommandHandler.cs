@@ -5,18 +5,17 @@ namespace Project.BLL.Handlers.EmployeeHandlers
 {
     public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand>
     {
-        private readonly IServicesRepo<Employee> employee;
-        private readonly IMapper mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateEmployeeCommandHandler(IServicesRepo<Employee> employee, IMapper mapper)
+        public CreateEmployeeCommandHandler(IUnitOfWork unitOfWork)
         {
-            this.employee = employee;
-            this.mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            await employee.CreateAsync(request.Employee);
+            await _unitOfWork.Employees.CreateAsync(request.Employee);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

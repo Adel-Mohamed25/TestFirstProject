@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Project.BLL.Commands.DepartmentCommands;
 using Project.BLL.Model;
-using Project.BLL.Services;
+using Project.BLL.Queries.DepartmentQueries;
 using Project.DAL.Entities;
 
 namespace Project.PL.Controllers
@@ -10,19 +12,19 @@ namespace Project.PL.Controllers
     [Authorize(Roles = "Admin , Hr")]
     public class DepartmentController : Controller
     {
-        private readonly IServicesRepo<Department> depart;
-        private readonly IMapper mapper;
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public DepartmentController(IServicesRepo<Department> depart, IMapper mapper)
+        public DepartmentController(IMediator mediator, IMapper mapper)
         {
-            this.depart = depart;
-            this.mapper = mapper;
+            _mediator = mediator;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> DepartmentServices()
         {
-            var data = await depart.GetAsync();
-            var result = mapper.Map<IEnumerable<DepartmentVM>>(data);
+            var data = await _mediator.Send(new GetAllDepartmentsQuery());
+            var result = _mapper.Map<IEnumerable<DepartmentVM>>(data);
             return View(result);
         }
 
@@ -38,8 +40,8 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var data = mapper.Map<Department>(department);
-                    await depart.CreateAsync(data);
+                    var data = _mapper.Map<Department>(department);
+                    await _mediator.Send(new CreateDepartmentCommand(data));
 
                     return RedirectToAction("DepartmentServices", "Department");
                 }
@@ -54,15 +56,15 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var data = await depart.GetByIdAsync(dep => dep.Department_Id == id);
-            var result = mapper.Map<DepartmentVM>(data);
+            var data = await _mediator.Send(new GetDepartmentByIdQuery(id));
+            var result = _mapper.Map<DepartmentVM>(data);
             return View(result);
         }
 
         public async Task<IActionResult> Update(int id)
         {
-            var data = await depart.GetByIdAsync(dep => dep.Department_Id == id);
-            var result = mapper.Map<DepartmentVM>(data);
+            var data = await _mediator.Send(new GetDepartmentByIdQuery(id));
+            var result = _mapper.Map<DepartmentVM>(data);
             return View(result);
         }
 
@@ -73,8 +75,8 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var data = mapper.Map<Department>(department);
-                    await depart.UpdateAsync(data);
+                    var data = _mapper.Map<Department>(department);
+                    await _mediator.Send(new UpdateDepartmentCommand(data));
                     return RedirectToAction("DepartmentServices", "Department");
                 }
             }
@@ -88,8 +90,8 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var data = await depart.GetByIdAsync(dep => dep.Department_Id == id);
-            var result = mapper.Map<DepartmentVM>(data);
+            var data = await _mediator.Send(new GetDepartmentByIdQuery(id));
+            var result = _mapper.Map<DepartmentVM>(data);
             return View(result);
         }
 
@@ -100,8 +102,8 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var data = mapper.Map<Department>(department);
-                    await depart.DeleteAsync(data);
+                    var data = _mapper.Map<Department>(department);
+                    await _mediator.Send(new DeleteDepartmentCommand(data));
                     return RedirectToAction("DepartmentServices", "Department");
                 }
             }

@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Project.BLL.Commands.EmployeeCommands;
 using Project.BLL.Helper;
 using Project.BLL.Model;
-using Project.BLL.Repository;
+using Project.BLL.Queries.DepartmentQueries;
+using Project.BLL.Queries.EmployeeQueries;
 using Project.BLL.Services;
 using Project.DAL.Entities;
 
@@ -14,34 +17,30 @@ namespace Project.PL.Controllers
     [Authorize(Roles = "Employee,Admin , Hr")]
     public class EmployeeController : Controller
     {
-        private readonly IServicesRepo<Employee> emp;
-        private readonly IServicesRepo<Department> depart;
+        private readonly IMediator _mediator;
         private readonly IMapper mapper;
         private readonly ICityRepo city;
         private readonly IDistrictRepo district;
-        private readonly EmployeeRepo repo;
 
-        public EmployeeController(IServicesRepo<Employee> emp, IServicesRepo<Department> depart, IMapper mapper, ICityRepo city, IDistrictRepo district, EmployeeRepo repo)
+        public EmployeeController(IMediator mediator, IMapper mapper, ICityRepo city, IDistrictRepo district)
         {
-            this.emp = emp;
-            this.depart = depart;
+            _mediator = mediator;
             this.mapper = mapper;
             this.city = city;
             this.district = district;
-            this.repo = repo;
         }
 
         public async Task<IActionResult> EmployeeServices(string searchvalue)
         {
             if (searchvalue is null)
             {
-                var data = await emp.GetAsync(emp => emp.IsActive == true && emp.IsDeleted == false);
+                var data = await _mediator.Send(new GetAllEmployeesQuery(emp => emp.IsActive == true && emp.IsDeleted == false));
                 var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
                 return View(result);
             }
             else
             {
-                var data = await emp.GetAsync(emp => (emp.Employee_Fname + emp.Employee_Lname).Contains(searchvalue) && emp.IsActive == true && emp.IsDeleted == false);
+                var data = await _mediator.Send(new GetAllEmployeesQuery(emp => (emp.Employee_Fname + emp.Employee_Lname).Contains(searchvalue) && emp.IsActive == true && emp.IsDeleted == false));
                 var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
                 return View(result);
             }
@@ -50,7 +49,7 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var data = await depart.GetAsync();
+            var data = await _mediator.Send(new GetAllDepartmentsQuery());
             ViewBag.departmentlist = new SelectList(data, "Department_Id", "Department_Name");
             return View();
         }
@@ -65,7 +64,7 @@ namespace Project.PL.Controllers
                     employee.CVName = employee.CV?.UploadFile("wwwroot", "Documents");
                     employee.ImageName = employee.Image?.UploadFile("wwwroot", "Images");
                     var data = mapper.Map<Employee>(employee);
-                    await emp.CreateAsync(data);
+                    await _mediator.Send(new CreateEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
             }
@@ -73,14 +72,15 @@ namespace Project.PL.Controllers
             {
                 ViewBag.Message = ex.Message;
             }
-            var departments = await depart.GetAsync();
+            var departments = await _mediator.Send(new GetAllDepartmentsQuery());
             ViewBag.departmentlist = new SelectList(departments, "Department_Id", "Department_Name");
             return View(employee);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
+            var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
             var result = mapper.Map<EmployeeVM>(data);
             return View(result);
         }
@@ -88,7 +88,7 @@ namespace Project.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> SoftDelete(int id)
         {
-            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
+            var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
             var result = mapper.Map<EmployeeVM>(data);
             return View(result);
         }
@@ -101,7 +101,7 @@ namespace Project.PL.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Employee>(employee);
-                    await repo.SoftDeleteAsync(data);
+                    await _mediator.Send(new SoftDeleteEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
             }
@@ -115,9 +115,9 @@ namespace Project.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
-            var departments = await depart.GetAsync();
+            var departments = await _mediator.Send(new GetAllDepartmentsQuery());
             ViewBag.departmentlist = new SelectList(departments, "Department_Id", "Department_Name");
-            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
+            var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
             var result = mapper.Map<EmployeeVM>(data);
             return View(result);
         }
@@ -132,7 +132,7 @@ namespace Project.PL.Controllers
                     //employee.CVName = employee.CV.UploadFile("Docs");
                     //employee.ImageName = employee.Image.UploadFile("Imgs");
                     var data = mapper.Map<Employee>(employee);
-                    await emp.UpdateAsync(data);
+                    await _mediator.Send(new UpdateEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices", "Employee");
                 }
             }
@@ -146,9 +146,17 @@ namespace Project.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id && emp.IsDeleted == true);
-            var result = mapper.Map<EmployeeVM>(data);
-            return View(result);
+            try
+            {
+                var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
+                var result = mapper.Map<EmployeeVM>(data);
+                return View(result);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("Error", ex.Message);
+                return RedirectToAction("EmployeeServices");
+            }
         }
 
         [HttpPost]
@@ -161,7 +169,7 @@ namespace Project.PL.Controllers
                     employee.CV?.RemoveFile("wwwroot", "Documents");
                     employee.Image?.RemoveFile("wwwroot", "Images");
                     var data = mapper.Map<Employee>(employee);
-                    await emp.DeleteAsync(data);
+                    await _mediator.Send(new DeleteEmployeeCommand(data));
                     return RedirectToAction("DeletedEmployee", "Employee");
                 }
             }
@@ -174,7 +182,7 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> DeletedEmployee()
         {
-            var data = await emp.GetAsync(emp => emp.IsDeleted == true);
+            var data = await _mediator.Send(new GetAllEmployeesQuery(emp => emp.IsDeleted == true));
             var result = mapper.Map<IEnumerable<EmployeeVM>>(data);
             return View(result);
         }
@@ -182,7 +190,7 @@ namespace Project.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> ReturnEmployee(int id)
         {
-            var data = await emp.GetByIdAsync(emp => emp.Employee_Id == id);
+            var data = await _mediator.Send(new GetEmployeeByIdQuery(id));
 
             var result = mapper.Map<EmployeeVM>(data);
 
@@ -197,7 +205,7 @@ namespace Project.PL.Controllers
                 if (ModelState.IsValid)
                 {
                     var data = mapper.Map<Employee>(employee);
-                    await repo.ReturnAsync(data);
+                    await _mediator.Send(new ReturnEmployeeCommand(data));
                     return RedirectToAction("EmployeeServices");
                 }
             }

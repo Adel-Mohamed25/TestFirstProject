@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Project.BLL.Handlers.EmployeeHandlers;
 using Project.BLL.Mapper;
+using Project.BLL.Queries.EmployeeQueries;
 using Project.BLL.Repository;
 using Project.BLL.Services;
 using Project.DAL.ConnectionData;
-using Project.DAL.Entities;
 using Project.DAL.Extend;
 using Project.PL.Languages;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 
@@ -54,19 +56,24 @@ builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()))
 builder.Services.AddLogging();
 
 // Add Scoped for appling DI
-builder.Services.AddScoped<IServicesRepo<Department>, DepartmentRepo>();
-
-builder.Services.AddScoped<IServicesRepo<Employee>, EmployeeRepo>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddScoped<EmployeeRepo>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 
 builder.Services.AddScoped<IDistrictRepo, DistrictRepo>();
 
 builder.Services.AddScoped<ICityRepo, CityRepo>();
 
 builder.Services.AddScoped<ICountryRepo, CountryRepo>();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
+    Assembly.GetExecutingAssembly(),
+    typeof(GetAllEmployeesQuery).Assembly,
+    typeof(GetAllEmployeesQueryHandler).Assembly
+));
 
 builder.Services.Configure<RequestLocalizationOptions>(option =>
 {

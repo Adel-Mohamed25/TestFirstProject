@@ -1,25 +1,34 @@
-﻿namespace Project.BLL.Repository
+﻿using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
+
+namespace Project.BLL.Repository
 {
     internal class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<UnitOfWork> logger;
         private readonly DbSet<T> _dbSet;
 
-        public GenericRepository(ApplicationDbContext context)
+        public GenericRepository(ApplicationDbContext context, ILogger<UnitOfWork> logger)
         {
             _context = context;
+            this.logger = logger;
             _dbSet = _context.Set<T>();
         }
 
 
-        public async Task<IEnumerable<T>> GetAsync()
+        public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>>? filter = null)
         {
-            return await _dbSet.AsNoTracking().ToListAsync();
+            if (filter == null)
+            {
+                return await _dbSet.AsNoTracking().ToListAsync();
+            }
+            return await _dbSet.AsNoTracking().Where(filter).ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(Expression<Func<T, bool>> filter)
         {
-            var result = await _dbSet.FindAsync(id);
+            var result = await _dbSet.AsNoTracking().Where(filter).FirstOrDefaultAsync();
 
             if (result == null)
                 throw new ArgumentNullException("No Result");

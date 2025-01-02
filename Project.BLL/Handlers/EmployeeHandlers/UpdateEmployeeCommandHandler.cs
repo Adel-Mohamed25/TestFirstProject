@@ -5,16 +5,17 @@ namespace Project.BLL.Handlers.EmployeeHandlers
 {
     public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand>
     {
-        private readonly IServicesRepo<Employee> employee;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateEmployeeCommandHandler(IServicesRepo<Employee> employee)
+        public UpdateEmployeeCommandHandler(IUnitOfWork unitOfWork)
         {
-            this.employee = employee;
+            _unitOfWork = unitOfWork;
         }
 
         async Task IRequestHandler<UpdateEmployeeCommand>.Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            await employee.UpdateAsync(request.employee);
+            await _unitOfWork.Employees.UpdateAsync(request.employee);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

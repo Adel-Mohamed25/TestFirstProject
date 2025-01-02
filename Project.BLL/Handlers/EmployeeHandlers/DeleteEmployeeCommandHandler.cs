@@ -5,15 +5,16 @@ namespace Project.BLL.Handlers.EmployeeHandlers
 {
     public class DeleteEmployeeCommandHandler : IRequestHandler<DeleteEmployeeCommand>
     {
-        private readonly IServicesRepo<Employee> employee;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteEmployeeCommandHandler(IServicesRepo<Employee> employee)
+        public DeleteEmployeeCommandHandler(IUnitOfWork unitOfWork)
         {
-            this.employee = employee;
+            _unitOfWork = unitOfWork;
         }
         public async Task Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
         {
-            await employee.DeleteAsync(request.employee);
+            await _unitOfWork.Employees.DeleteAsync(request.employee);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }
