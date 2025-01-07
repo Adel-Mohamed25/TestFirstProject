@@ -37,6 +37,7 @@ namespace Project.PL.Controllers
 
                 if (result.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(data, "Employee");
                     return RedirectToAction("SignIn");
                 }
                 else
@@ -67,6 +68,17 @@ namespace Project.PL.Controllers
             try
             {
                 var data = await userManager.FindByEmailAsync(signInVM.Email);
+                if (data == null)
+                {
+                    ModelState.AddModelError("Error", "User Not Found");
+                }
+
+                if (await userManager.IsLockedOutAsync(data))
+                {
+                    ModelState.AddModelError("Error", "The account is temporarily locked due to incorrect login attempts. Please try again after 5 minutes.");
+                    return View(ModelState);
+                }
+
                 var result = await signInManager.PasswordSignInAsync(data.UserName, signInVM.Password, signInVM.RememberMe, false);
                 if (result.Succeeded)
                 {
@@ -76,7 +88,7 @@ namespace Project.PL.Controllers
             catch
             {
                 ModelState.AddModelError("", "Invalid Email or Password");
-                return View(signInVM);
+                return View(ModelState);
             }
             return View(signInVM);
         }
@@ -144,7 +156,7 @@ namespace Project.PL.Controllers
 
                 if (user != null)
                 {
-                    var result = await userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
+                    IdentityResult result = await userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
 
                     if (result.Succeeded)
                     {

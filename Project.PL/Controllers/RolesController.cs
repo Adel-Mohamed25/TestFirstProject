@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,13 @@ namespace Project.PL.Controllers
     {
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IMapper _mapper;
 
-        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
+            _mapper = mapper;
         }
 
 
@@ -45,8 +48,13 @@ namespace Project.PL.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await roleManager.CreateAsync(role);
-                    return RedirectToAction("GetRoles");
+                    IdentityResult result = await roleManager.CreateAsync(role);
+
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("GetRoles");
+                    }
+                    return View(ModelState);
                 }
                 return View(role);
             }
@@ -76,9 +84,7 @@ namespace Project.PL.Controllers
                 {
                     return View("Error", "Role not found.");
                 }
-
-                data.Name = role.Name;
-
+                _mapper.Map(role, data);
                 var result = await roleManager.UpdateAsync(data);
                 if (result.Succeeded)
                 {

@@ -11,7 +11,7 @@ namespace Project.Apis.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,Hr")]
+    [Authorize(Roles = "Admin,Hr,Employee")]
     public class DepartmentController : BaseController
     {
         [HttpGet]

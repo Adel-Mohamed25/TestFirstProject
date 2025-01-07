@@ -1,4 +1,5 @@
-﻿using Project.BLL.Model;
+﻿using Microsoft.AspNetCore.Identity;
+using Project.BLL.Model;
 using Project.DAL.Extend;
 namespace Project.BLL.Mapper
 {
@@ -25,7 +26,10 @@ namespace Project.BLL.Mapper
             CreateMap<ApplicationUser, SignUpVM>();
 
             CreateMap<ApplicationUser, ApplicationUser>()
-           .ForMember(dest => dest.Id, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
+
+            CreateMap<IdentityRole, IdentityRole>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
         }
     }

@@ -31,15 +31,16 @@ namespace Project.Apis.Controllers
         {
             if (ModelState.IsValid)
             {
-                var data = mapper.Map<ApplicationUser>(UserRegister);
-                IdentityResult result = await userManager.CreateAsync(data);
+                var user = mapper.Map<ApplicationUser>(UserRegister);
+                IdentityResult result = await userManager.CreateAsync(user, UserRegister.Password);
                 if (result.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(user, "Employee");
                     return Ok($"Message: {HttpStatusCode.Created}");
                 }
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError("Password", error.Description);
+                    ModelState.AddModelError("Error", error.Description);
                 }
             }
             return BadRequest(ModelState);
@@ -53,6 +54,12 @@ namespace Project.Apis.Controllers
                 var user = await userManager.FindByEmailAsync(UserLogIn.Email);
                 if (user != null)
                 {
+                    if (await userManager.IsLockedOutAsync(user))
+                    {
+                        ModelState.AddModelError("Error", "The account is temporarily locked due to incorrect login attempts. Please try again after 5 minutes.");
+                        return BadRequest(ModelState);
+                    }
+
                     bool logInFound = await userManager.CheckPasswordAsync(user, UserLogIn.Password);
 
                     if (logInFound)
@@ -96,14 +103,12 @@ namespace Project.Apis.Controllers
 
                     }
 
-                    ModelState.AddModelError("UserName", "UserName Or Password InValid");
+                    ModelState.AddModelError("Error", "UserName Or Password InValid");
                 }
-
-                ModelState.AddModelError("Email", "User not found.");
-                return BadRequest(ModelState);
-
             }
             return BadRequest(ModelState);
         }
+
+
     }
 }

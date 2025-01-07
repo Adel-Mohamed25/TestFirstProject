@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Project.BLL.Caching;
 using Project.BLL.Handlers.EmployeeHandlers;
 using Project.BLL.Mapper;
 using Project.BLL.Queries.EmployeeQueries;
@@ -47,6 +48,13 @@ var connectionstring = builder.Configuration.GetConnectionString("ApplicationCon
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(connectionstring));
 
+// Add Distributed Caching With Redis
+builder.Services.AddStackExchangeRedisCache(option =>
+{
+    option.Configuration = builder.Configuration.GetConnectionString("Redis");
+    option.InstanceName = "EntityInstance";
+});
+
 
 // Add Automapper  
 builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()));
@@ -56,7 +64,7 @@ builder.Services.AddLogging();
 
 // Add Scoped for appling DI
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
     Assembly.GetExecutingAssembly(),
@@ -114,7 +122,10 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
-    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequiredUniqueChars = 8;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.AllowedForNewUsers = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
 

@@ -23,20 +23,27 @@ namespace Project.Apis.Controllers
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            var result = await userManager.Users.AsNoTracking().ToListAsync();
-            return Ok(result);
+            try
+            {
+                var result = await userManager.Users.AsNoTracking().ToListAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET api/<UserController>/5
         [HttpGet("GetUserById/{id}")]
-        public async Task<IActionResult> GetUserById(string id)
+        public async Task<IActionResult> GetUserById([FromRoute] string id)
         {
             var result = await userManager.FindByIdAsync(id);
             if (result != null)
             {
                 return Ok(result);
             }
-            return NotFound(ModelState);
+            return NotFound("User Not Found.");
         }
 
 
@@ -44,14 +51,19 @@ namespace Project.Apis.Controllers
         [HttpPut("PutUser")]
         public async Task<IActionResult> PutUser([FromBody] ApplicationUser User)
         {
-            var data = await userManager.FindByIdAsync(User.Id);
-            if (data != null)
+            if (ModelState.IsValid)
             {
+                var data = await userManager.FindByIdAsync(User.Id);
+                if (data == null)
+                {
+                    return NotFound("User Not Found.");
+                }
                 mapper.Map(User, data);
-                IdentityResult result = await userManager.UpdateAsync(User);
+                IdentityResult result = await userManager.UpdateAsync(data);
+
                 if (result.Succeeded)
                 {
-                    return Accepted(result);
+                    return Ok("User Updated Successfully.");
                 }
                 foreach (var error in result.Errors)
                 {
@@ -61,10 +73,27 @@ namespace Project.Apis.Controllers
             return BadRequest(ModelState);
         }
 
-        //// DELETE api/<UserController>/5
-        //[HttpDelete("DeleteUser/{id}")]
-        //public Task<IActionResult> DeleteUser(int id)
-        //{
-        //}
+        // DELETE api/<UserController>/5
+        [HttpDelete("DeleteUser/{id}")]
+        public async Task<IActionResult> DeleteUser([FromRoute] string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound("User Not Found.");
+            }
+
+            IdentityResult result = await userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+            {
+                return Ok("User Deleted Successfully .");
+            }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+            return BadRequest(ModelState);
+        }
     }
 }
