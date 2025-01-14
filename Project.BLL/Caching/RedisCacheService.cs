@@ -18,7 +18,7 @@ namespace Project.BLL.Caching
             var data = _cache?.GetString(key);
             if (data == null)
             {
-                return default(T);
+                return default(T?);
             }
             return JsonSerializer.Deserialize<T>(data)!;
         }

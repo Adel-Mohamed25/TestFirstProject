@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project.BLL.Commands.EmployeeCommands;
 using Project.BLL.Helper;
 using Project.BLL.Model;
@@ -11,7 +12,7 @@ namespace Project.Apis.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin,Hr")]
+    [Authorize(Roles = "Admin,Hr")]
     public class EmployeeController : BaseController
     {
         [HttpGet]
