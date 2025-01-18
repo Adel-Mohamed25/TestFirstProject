@@ -15,6 +15,12 @@ namespace Project.Apis.Controllers
     [Authorize(Roles = "Admin,Hr")]
     public class EmployeeController : BaseController
     {
+        private readonly ILogger<EmployeeController> _logger;
+
+        public EmployeeController(ILogger<EmployeeController> logger)
+        {
+            _logger = logger;
+        }
         [HttpGet]
         [Route("GetEmployees")]
         public async Task<IActionResult> GetEmployees()
@@ -30,6 +36,8 @@ namespace Project.Apis.Controllers
                     Message = "Succed",
                     Data = result
                 });
+
+                //return StatusCode(200, result);
             }
             catch (Exception ex)
             {
@@ -61,6 +69,7 @@ namespace Project.Apis.Controllers
             }
             catch (Exception ex)
             {
+                //_logger.LogError(ex, ex.Message);
                 return NotFound(new Response<string>()
                 {
                     Code = HttpStatusCode.NotFound,

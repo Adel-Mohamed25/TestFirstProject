@@ -17,11 +17,8 @@ namespace Project.BLL.Handlers.EmployeeHandlers
         public async Task<IEnumerable<Employee>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
         {
             var data = _cache.GetData<IEnumerable<Employee>>("Employees");
-            if (data is not null)
-            {
-                return data;
-            }
-            data = await _unitOfWork.Employees.GetAsync(request.filter);
+            if (data is null)
+                data = await _unitOfWork.Employees.GetAsync(request.filter);
             _cache.SetData("Employees", data);
             return data;
         }

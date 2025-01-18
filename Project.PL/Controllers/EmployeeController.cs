@@ -180,7 +180,7 @@ namespace Project.PL.Controllers
 
         public async Task<IActionResult> DeletedEmployee()
         {
-            var data = await _mediator.Send(new GetAllEmployeesQuery(emp => emp.IsDeleted == true));
+            var data = await _mediator.Send(new GetAllDeletedEmployeesQuery(emp => emp.IsDeleted == true));
             var result = _mapper.Map<IEnumerable<EmployeeVM>>(data);
             return View(result);
         }

@@ -37,7 +37,7 @@ namespace Project.BLL.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while saving changes in UnitOfWork.");
+                _logger.LogCritical(ex, "Error occurred while saving changes in UnitOfWork.");
                 throw;
             }
         }
