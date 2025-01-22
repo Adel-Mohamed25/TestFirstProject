@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Project.Apis.MiddleWares;
 using Project.BLL.Caching;
 using Project.BLL.Handlers.EmployeeHandlers;
 using Project.BLL.Mapper;
@@ -18,14 +19,14 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add SeriLog
-var logger = new LoggerConfiguration()
+Log.Logger = new LoggerConfiguration()
     .ReadFrom
     .Configuration(builder.Configuration)
     .CreateLogger();
 
-builder.Logging.AddSerilog(logger);
+builder.Host.UseSerilog();
+//builder.Logging.AddSerilog(Log.Logger);
 
-Log.Logger = logger;
 
 try
 {
@@ -119,8 +120,8 @@ try
     // Add Automapper  
     builder.Services.AddAutoMapper(mapper => mapper.AddProfile(new DomainProfile()));
 
-    // Add Logging
-    builder.Services.AddLogging();
+    //// Add Logging
+    //builder.Services.AddLogging();
 
     // Add Scoped for appling DI
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -144,10 +145,13 @@ try
     }
 
     app.UseCors("AllowSpecificOrigin");
+    app.UseSerilogRequestLogging();
 
     app.UseHttpsRedirection();
 
     app.UseAuthorization();
+
+    app.UseMiddleware<ErrorHandlingMiddleware>();
 
     app.MapControllers();
 

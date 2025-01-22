@@ -1,7 +1,12 @@
 ﻿global using AutoMapper;
+global using MediatR;
+global using Microsoft.AspNetCore.Identity;
 global using Microsoft.EntityFrameworkCore;
+global using Project.BLL.Caching;
 global using Project.BLL.Queries.EmployeeQueries;
 global using Project.BLL.Services;
 global using Project.DAL.ConnectionData;
 global using Project.DAL.Entities;
+global using Project.DAL.Extend;
+global using System.Text;
 global using System.Text.Json.Serialization;
