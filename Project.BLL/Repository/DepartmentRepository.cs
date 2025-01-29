@@ -49,18 +49,18 @@ namespace Project.BLL.Repository
         }
 
 
-        public async Task CreateAsync(Department entity)
+        public async Task CreateAsync(Department entity, CancellationToken cancellationToken)
         {
-            await _context.Departments.AddAsync(entity);
+            await _context.Departments.AddAsync(entity, cancellationToken);
         }
 
-        public async Task UpdateAsync(Department entity)
+        public void UpdateAsync(Department entity)
         {
             _context.Departments.Update(entity);
         }
 
 
-        public async Task DeleteAsync(Department entity)
+        public void DeleteAsync(Department entity)
         {
             _context.Departments.Remove(entity);
         }

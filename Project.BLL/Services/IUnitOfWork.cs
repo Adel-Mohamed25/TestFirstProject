@@ -8,6 +8,6 @@
         ICountryRepository Countries { get; }
         IDistrictRepository Districts { get; }
 
-        Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

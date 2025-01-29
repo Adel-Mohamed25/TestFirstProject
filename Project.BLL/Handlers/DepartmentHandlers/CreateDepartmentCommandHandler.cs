@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Project.BLL.Commands.DepartmentCommands;
+﻿using Project.BLL.Commands.DepartmentCommands;
 
 namespace Project.BLL.Handlers.DepartmentHandlers
 {
@@ -14,8 +13,8 @@ namespace Project.BLL.Handlers.DepartmentHandlers
 
         public async Task Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
         {
-            await _unitOfWork.Departments.CreateAsync(request.Department);
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.Departments.CreateAsync(request.Department, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 }

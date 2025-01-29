@@ -15,13 +15,13 @@ namespace Project.Apis.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper mapper;
         private readonly IConfiguration configuration;
 
         public AccountController(UserManager<ApplicationUser> userManager, IMapper mapper, IConfiguration configuration)
         {
-            this.userManager = userManager;
+            _userManager = userManager;
             this.mapper = mapper;
             this.configuration = configuration;
         }
@@ -32,10 +32,10 @@ namespace Project.Apis.Controllers
             if (ModelState.IsValid)
             {
                 var user = mapper.Map<ApplicationUser>(UserRegister);
-                IdentityResult result = await userManager.CreateAsync(user, UserRegister.Password);
+                IdentityResult result = await _userManager.CreateAsync(user, UserRegister.Password);
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(user, "Employee");
+                    await _userManager.AddToRoleAsync(user, "Employee");
                     return Ok($"Message: {HttpStatusCode.Created}");
                 }
                 foreach (var error in result.Errors)
@@ -51,16 +51,16 @@ namespace Project.Apis.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByEmailAsync(UserLogIn.Email);
+                var user = await _userManager.FindByEmailAsync(UserLogIn.Email);
                 if (user != null)
                 {
-                    if (await userManager.IsLockedOutAsync(user))
+                    if (await _userManager.IsLockedOutAsync(user))
                     {
                         ModelState.AddModelError("Error", "The account is temporarily locked due to incorrect login attempts. Please try again after 5 minutes.");
                         return BadRequest(ModelState);
                     }
 
-                    bool logInFound = await userManager.CheckPasswordAsync(user, UserLogIn.Password);
+                    bool logInFound = await _userManager.CheckPasswordAsync(user, UserLogIn.Password);
 
                     if (logInFound)
                     {
@@ -73,7 +73,7 @@ namespace Project.Apis.Controllers
                         userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
                         userClaims.Add(new Claim(ClaimTypes.Name, user.UserName));
 
-                        var userRoles = await userManager.GetRolesAsync(user);
+                        var userRoles = await _userManager.GetRolesAsync(user);
                         foreach (var role in userRoles)
                         {
                             userClaims.Add(new Claim(ClaimTypes.Role, role));

@@ -51,11 +51,11 @@ namespace Project.BLL.Repository
             }
         }
 
-        public async Task CreateAsync(T entity)
+        public async Task CreateAsync(T entity, CancellationToken cancellationToken)
         {
             try
             {
-                await _dbSet.AddAsync(entity);
+                await _dbSet.AddAsync(entity, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -64,7 +64,7 @@ namespace Project.BLL.Repository
             }
         }
 
-        public async Task UpdateAsync(T entity)
+        public void UpdateAsync(T entity)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace Project.BLL.Repository
             }
         }
 
-        public async Task DeleteAsync(T entity)
+        public void DeleteAsync(T entity)
         {
             try
             {

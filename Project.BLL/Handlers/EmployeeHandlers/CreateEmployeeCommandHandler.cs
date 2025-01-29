@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Project.BLL.Commands.EmployeeCommands;
+﻿using Project.BLL.Commands.EmployeeCommands;
 
 namespace Project.BLL.Handlers.EmployeeHandlers
 {
@@ -14,8 +13,8 @@ namespace Project.BLL.Handlers.EmployeeHandlers
 
         public async Task Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            await _unitOfWork.Employees.CreateAsync(request.Employee);
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.Employees.CreateAsync(request.Employee, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 }

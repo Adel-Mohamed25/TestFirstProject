@@ -24,8 +24,8 @@ Log.Logger = new LoggerConfiguration()
     .Configuration(builder.Configuration)
     .CreateLogger();
 
-builder.Host.UseSerilog();
-//builder.Logging.AddSerilog(Log.Logger);
+builder.Logging.AddSerilog(Log.Logger);
+//builder.Host.UseSerilog();
 
 
 try
@@ -145,7 +145,6 @@ try
     }
 
     app.UseCors("AllowSpecificOrigin");
-    app.UseSerilogRequestLogging();
 
     app.UseHttpsRedirection();
 

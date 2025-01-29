@@ -29,11 +29,11 @@ namespace Project.BLL.Repository
             _context.Dispose();
         }
 
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             try
             {
-                return await _context.SaveChangesAsync();
+                return await _context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
             {

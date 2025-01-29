@@ -59,13 +59,13 @@ namespace Project.BLL.Repository
 
         }
 
-        public async Task CreateAsync(Employee entity)
+        public async Task CreateAsync(Employee entity, CancellationToken cancellationToken)
         {
             entity.CreationDate = DateTime.Now;
-            await _context.Employees.AddAsync(entity);
+            await _context.Employees.AddAsync(entity, cancellationToken);
         }
 
-        public async Task DeleteAsync(Employee entity)
+        public void DeleteAsync(Employee entity)
         {
             _context.Employees.Remove(entity);
         }
@@ -100,7 +100,7 @@ namespace Project.BLL.Repository
             }
         }
 
-        public async Task UpdateAsync(Employee entity)
+        public void UpdateAsync(Employee entity)
         {
             entity.IsUpdated = true;
             entity.UpdatedDate = DateTime.Now;
